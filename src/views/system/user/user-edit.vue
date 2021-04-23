@@ -34,6 +34,7 @@
               class="ele-block"
               v-model="form.sex"
               placeholder="请选择性别">
+              <el-option label="保密" :value="0"/>
               <el-option label="男" :value="1"/>
               <el-option label="女" :value="2"/>
             </el-select>
