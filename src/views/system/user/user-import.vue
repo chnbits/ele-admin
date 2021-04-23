@@ -14,7 +14,7 @@
       v-loading="loading"
       accept=".xls,.xlsx"
       :show-file-list="false"
-      :before-upload="beforeUpload">
+      :before-upload="importFile">
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或 <em>点击上传</em></div>
       <div class="el-upload__tip ele-text-center" slot="tip">
@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import XLSX from 'xlsx';
 export default {
   name: 'UserImport',
   props: {
@@ -43,28 +44,58 @@ export default {
       // 导入请求状态
       loading: false,
       // 导入模板下载地址
-      url: 'https://cdn.eleadmin.com/20200610/用户导入模板.xlsx'
+      url: 'https://laratest.com/files/用户导入模板.xlsx'
     };
   },
   methods: {
     /* 上传 */
-    beforeUpload(file) {
-      this.loading = true;
-      let formData = new FormData();
-      formData.append('file', file);
-      this.$http.post('/sys/user/import', formData).then(res => {
-        this.loading = false;
-        if (res.data.code === 0) {
-          this.$message({type: 'success', message: res.data.msg});
-          this.updateVisible(false);
-          this.$emit('done');
-        } else {
-          this.$message.error(res.data.msg);
-        }
-      }).catch(e => {
-        this.loading = false;
-        this.$message.error(e.message);
-      });
+    // beforeUpload1(file) {
+    //   this.loading = true;
+    //   let formData = new FormData();
+    //   formData.append('file', file);
+    //   console.log(formData.get('file'))
+    //   this.$http.post('/sys/user/import', formData).then(res => {
+    //     this.loading = false;
+    //     if (res.data.code === 0) {
+    //       this.$message({type: 'success', message: res.data.msg});
+    //       this.updateVisible(false);
+    //       this.$emit('done');
+    //     } else {
+    //       this.$message.error(res.data.msg);
+    //     }
+    //   }).catch(e => {
+    //     this.loading = false;
+    //     this.$message.error(e.message);
+    //   });
+    //   return false;
+    // },
+
+    importFile(file) {
+      let reader = new FileReader();
+      reader.onload = (e) => {
+        let data = new Uint8Array(e.target.result);
+        let workbook = XLSX.read(data, {type: 'array'});
+        let sheetNames = workbook.SheetNames;
+        let worksheet = workbook.Sheets[sheetNames[0]];
+        // 解析成二维数组
+        let aoa = XLSX.utils.sheet_to_json(worksheet, {header: 1});
+
+        this.$http.post('/sys/user/import', {'data':aoa}).then(res => {
+          this.loading = false;
+          if (res.data.code === 0) {
+            this.$message({type: 'success', message: res.data.msg});
+            this.updateVisible(false);
+            this.$emit('done');
+          } else {
+            this.$message.error(res.data.msg);
+          }
+        }).catch(e => {
+          this.loading = false;
+          this.$message.error(e.message);
+        });
+
+      };
+      reader.readAsArrayBuffer(file);
       return false;
     },
     /* 更新visible */
