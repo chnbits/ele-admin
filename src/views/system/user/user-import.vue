@@ -49,27 +49,6 @@ export default {
   },
   methods: {
     /* 上传 */
-    // beforeUpload1(file) {
-    //   this.loading = true;
-    //   let formData = new FormData();
-    //   formData.append('file', file);
-    //   console.log(formData.get('file'))
-    //   this.$http.post('/sys/user/import', formData).then(res => {
-    //     this.loading = false;
-    //     if (res.data.code === 0) {
-    //       this.$message({type: 'success', message: res.data.msg});
-    //       this.updateVisible(false);
-    //       this.$emit('done');
-    //     } else {
-    //       this.$message.error(res.data.msg);
-    //     }
-    //   }).catch(e => {
-    //     this.loading = false;
-    //     this.$message.error(e.message);
-    //   });
-    //   return false;
-    // },
-
     importFile(file) {
       let reader = new FileReader();
       reader.onload = (e) => {
