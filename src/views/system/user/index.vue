@@ -32,6 +32,7 @@
                 v-model="where.sex"
                 placeholder="请选择"
                 class="ele-fluid">
+                <el-option label="保密" value="0"/>
                 <el-option label="男" value="1"/>
                 <el-option label="女" value="2"/>
               </el-select>
