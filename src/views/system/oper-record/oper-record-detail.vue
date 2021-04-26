@@ -45,9 +45,9 @@
               {{ data.description }}
             </div>
           </el-form-item>
-          <el-form-item label="请求耗时:">
+          <el-form-item label="请求地址:">
             <div class="ele-text-secondary">
-              {{ data.spendTime / 1000 }}s
+              {{ data.url }}
             </div>
           </el-form-item>
           <el-form-item label="请求状态:">
@@ -62,29 +62,9 @@
       <div style="margin: 12px 0;">
         <el-divider/>
       </div>
-      <el-form-item label="请求地址:">
-        <div class="ele-text-secondary">
-          {{ data.url }}
-        </div>
-      </el-form-item>
-      <el-form-item label="调用方法:">
-        <div class="ele-text-secondary">
-          {{ data.operMethod }}
-        </div>
-      </el-form-item>
       <el-form-item label="请求参数:">
         <div class="ele-text-secondary">
           {{ data.param }}
-        </div>
-      </el-form-item>
-      <el-form-item label="返回结果:">
-        <div class="ele-text-secondary">
-          {{ data.result }}
-        </div>
-      </el-form-item>
-      <el-form-item label="备注:">
-        <div class="ele-text-secondary">
-          {{ data.comments }}
         </div>
       </el-form-item>
     </el-form>

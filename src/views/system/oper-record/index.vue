@@ -161,15 +161,15 @@ export default {
           showOverflowTooltip: true,
           slot: 'state'
         },
-        {
-          prop: 'spendTime',
-          label: '耗时',
-          sortable: 'custom',
-          showOverflowTooltip: true,
-          formatter: (row, column, cellValue) => {
-            return cellValue / 1000 + 's';
-          }
-        },
+        // {
+        //   prop: 'spendTime',
+        //   label: '耗时',
+        //   sortable: 'custom',
+        //   showOverflowTooltip: true,
+        //   formatter: (row, column, cellValue) => {
+        //     return cellValue / 1000 + 's';
+        //   }
+        // },
         {
           prop: 'createTime',
           label: '操作时间',
