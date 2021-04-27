@@ -30,7 +30,7 @@
               <el-form-item>
                 <el-input
                   v-model="where.dictDataCode"
-                  placeholder="请输入字典项值"
+                  placeholder="请输入字典项名"
                   clearable
                   size="small"/>
               </el-form-item>
@@ -120,6 +120,13 @@ export default {
         },
         {
           prop: 'dictDataCode',
+          label: '字典项名',
+          sortable: 'custom',
+          showOverflowTooltip: true,
+          minWidth: 110
+        },
+        {
+          prop: 'dictDataValue',
           label: '字典项值',
           sortable: 'custom',
           showOverflowTooltip: true,

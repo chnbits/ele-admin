@@ -21,10 +21,18 @@
           clearable/>
       </el-form-item>
       <el-form-item
-        label="字典项值:"
+        label="字典项名:"
         prop="dictDataCode">
         <el-input
           v-model="form.dictDataCode"
+          placeholder="请输入字典项名"
+          clearable/>
+      </el-form-item>
+      <el-form-item
+        label="字典项值:"
+        prop="dictDataValue">
+        <el-input
+          v-model="form.dictDataValue"
           placeholder="请输入字典项值"
           clearable/>
       </el-form-item>
@@ -80,6 +88,9 @@ export default {
           {required: true, message: '请输入字典项名称', trigger: 'blur'}
         ],
         dictDataCode: [
+          {required: true, message: '请输入字典项名', trigger: 'blur'}
+        ],
+        dictDataValue: [
           {required: true, message: '请输入字典项值', trigger: 'blur'}
         ],
         sortNumber: [
