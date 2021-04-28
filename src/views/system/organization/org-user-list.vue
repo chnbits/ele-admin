@@ -216,7 +216,7 @@ export default {
     /* 删除 */
     remove(row) {
       const loading = this.$loading({lock: true});
-      this.$http.delete('/sys/user/' + row.userId).then(res => {
+      this.$http.post('/sys/user/' + row.userId).then(res => {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});
@@ -232,9 +232,7 @@ export default {
     /* 更改状态 */
     editState(row) {
       const loading = this.$loading({lock: true});
-      let params = new FormData();
-      params.append('state', row.state);
-      this.$http.put('/sys/user/state/' + row.userId, params).then(res => {
+      this.$http.put('/sys/user/state/' + row.userId, {'state':row.state}).then(res => {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});
