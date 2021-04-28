@@ -130,7 +130,7 @@ export default {
         type: 'warning'
       }).then(() => {
         const loading = this.$loading({lock: true});
-        this.$http.delete('/sys/organization/' + this.current.organizationId).then(res => {
+        this.$http.put('/sys/organization/' + this.current.organizationId).then(res => {
           loading.close();
           if (res.data.code === 0) {
             this.$message({type: 'success', message: res.data.msg});
