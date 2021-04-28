@@ -191,13 +191,7 @@ export default {
       // tab页选中
       active: 'info',
       // 表单数据
-      form: {
-        nickname: 'Jasmine',
-        sex: 0,
-        email: 'eleadmin@eclouds.com',
-        tellPre: '0752',
-        avatar: 'https://cdn.eleadmin.com/20200610/avatar.jpg'
-      },
+      form: {},
       // 表单验证规则
       rules: {
         nickname: [
