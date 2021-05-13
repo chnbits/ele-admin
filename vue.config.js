@@ -2,7 +2,7 @@ const CompressionWebpackPlugin = require('compression-webpack-plugin');
 
 module.exports = {
   productionSourceMap: false,
-  transpileDependencies: ['element-ui', 'ele-admin'],
+  transpileDependencies: ['element-ui', 'ele-admin', 'vue-i18n'],
   chainWebpack: config => {
     config.plugins.delete('prefetch');
     if (process.env.NODE_ENV !== 'development') {

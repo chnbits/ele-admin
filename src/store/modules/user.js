@@ -35,7 +35,7 @@ export default {
     },
     TAB_PUSH(state, obj) {
       if (!state.tabs.some(r => r.path === obj.path)) {
-        state.tabs.push(obj);
+        state.tabs = state.tabs.concat([obj]);
       }
     }
   },
@@ -106,21 +106,27 @@ export default {
           return resolve({menus: menus});
         }
         axios.get(setting.menuUrl).then(res => {
-          let result = setting.parseMenu ? setting.parseMenu(res.data) : res.data;
-          let menus = result.data, home = null;
-          if (!menus) {
+          let result = setting.parseMenu ? setting.parseMenu(res.data) : res.data, home = null;
+          // 获取用户的信息、角色、权限
+          if (result.user) {
+            setting.cacheUser(result.user);
+            commit('SET', {key: 'user', value: result.user});
+            commit('SET', {key: 'roles', value: result.user.roles});
+            commit('SET', {key: 'authorities', value: result.user.authorities});
+          }
+          // 获取用户的菜单
+          if (!result.data) {
             return reject(new Error(result.msg));
           }
-          util.eachTreeData(menus, item => {
-            if (setting.parseMenuItem) {
-              item = setting.parseMenuItem(item);
-            }
+          let menus = util.formatTreeData(result.data, (d) => {
+            let item = setting.parseMenuItem ? setting.parseMenuItem(d) : Object.assign({}, d);
             item.meta = Object.assign({
               title: item.title,
               icon: item.icon,
               hide: item.hide,
               active: item.active || item.uid,
-              hideFooter: item.hideFooter
+              hideFooter: item.hideFooter,
+              hideSidebar: item.hideSidebar
             }, item.meta);
             if (!item.children || !item.children.length) {
               if (!home && item.path && !(
@@ -142,6 +148,7 @@ export default {
                 item.path = cp.substring(0, cp.lastIndexOf('/'));
               }
             }
+            return item;
           });
           commit('SET', {key: 'menus', value: menus});
           resolve({menus: menus, home: home});
@@ -176,15 +183,8 @@ export default {
           last = state.tabs[i];
           lastPath = last.path;
         }
-        commit('SET', {
-          key: 'tabs',
-          value: state.tabs.filter(d => d.path !== path)
-        });
-        resolve({
-          lastIndex: lastIndex,
-          lastPath: lastPath,
-          last: last
-        });
+        commit('SET', {key: 'tabs', value: state.tabs.filter(d => d.path !== path)});
+        resolve({lastIndex: lastIndex, lastPath: lastPath, last: last});
       });
     },
     /**
@@ -203,10 +203,7 @@ export default {
     tabRemoveLeft({commit, state}, path) {
       for (let i = 0; i < state.tabs.length; i++) {
         if (state.tabs[i].path === path) {
-          commit('SET', {
-            key: 'tabs',
-            value: state.tabs.slice(i)
-          });
+          commit('SET', {key: 'tabs', value: state.tabs.slice(i)});
           break;
         }
       }
@@ -220,10 +217,7 @@ export default {
     tabRemoveRight({commit, state}, path) {
       for (let i = 0; i < state.tabs.length; i++) {
         if (state.tabs[i].path === path) {
-          commit('SET', {
-            key: 'tabs',
-            value: state.tabs.slice(0, i + 1)
-          });
+          commit('SET', {key: 'tabs', value: state.tabs.slice(0, i + 1)});
           break;
         }
       }
@@ -235,24 +229,24 @@ export default {
      * @param path {String} tab路由
      */
     tabRemoveOther({commit, state}, path) {
-      commit('SET', {
-        key: 'tabs',
-        value: state.tabs.filter(d => d.path === path)
-      });
+      commit('SET', {key: 'tabs', value: state.tabs.filter(d => d.path === path)});
     },
     /**
      * 修改指定tab标题
      * @param commit
      * @param state
-     * @param obj {{path: String, title: String}}
+     * @param obj {{path: String, title: String, closable: Boolean}}
      */
     tabSetTitle({commit, state}, obj) {
-      let i = state.tabs.findIndex(d => d.path === obj.path);
-      let tabs = state.tabs.slice(0, i).concat([
-        Object.assign({}, state.tabs[i], {
-          title: obj.title
-        })
-      ]).concat(state.tabs.slice(i + 1));
+      let i = state.tabs.findIndex(d => d.path === obj.path),
+        data = Object.assign({}, state.tabs[i]);
+      if (typeof obj.title !== 'undefined') {
+        data.title = obj.title;
+      }
+      if (typeof obj.closable !== 'undefined') {
+        data.closable = obj.closable;
+      }
+      let tabs = state.tabs.slice(0, i).concat([data]).concat(state.tabs.slice(i + 1));
       commit('SET', {key: 'tabs', value: tabs});
     }
   }

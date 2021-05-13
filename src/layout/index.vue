@@ -1,6 +1,7 @@
 <!-- 框架布局 -->
 <template>
   <ele-pro-layout
+    ref="layout"
     :collapse="theme.collapse"
     :fixed-header="theme.fixedHeader"
     :fixed-sidebar="theme.fixedSidebar"
@@ -16,6 +17,7 @@
     :body-full="theme.bodyFull"
     :show-footer="theme.showFooter"
     :hide-footers="hideFooters"
+    :hide-sidebars="hideSidebars"
     :keep-alive-list="keepAliveList"
     :home-title="homeTitle"
     :project-name="projectName"
@@ -27,6 +29,7 @@
     :dark-mode="theme.darkMode"
     :weak-mode="theme.weakMode"
     :show-content="showContent"
+    :i18n="i18n"
     @update-collapse="updateCollapse"
     @update-screen="updateScreen"
     @logo-click="onLogoClick"
@@ -46,7 +49,8 @@
     <template slot="right">
       <ele-header-right
         :show-setting="needSetting"
-        @item-click="onItemClick"/>
+        @item-click="onItemClick"
+        @change-language="changeLanguage"/>
     </template>
     <!-- 全局页脚 -->
     <template #footer>
@@ -74,17 +78,22 @@ export default {
   computed: {
     // 主页标题
     homeTitle() {
-      return setting.homeTitle;
+      return this.$t('layout.home');
+      //return setting.homeTitle;  // 移除国际化后使用这一行
     },
     // 不显示全局页脚的路由地址
     hideFooters() {
       return setting.hideFooters;
     },
+    // 不显示侧边栏的路由地址
+    hideSidebars() {
+      return setting.hideSidebars;
+    },
     // 需要缓存的组件
     keepAliveList() {
       return setting.keepAliveList;
     },
-    // 是否需要主题设置按钮
+    // 是否需要主题设置抽屉
     needSetting() {
       return setting.showSetting;
     },
@@ -98,7 +107,7 @@ export default {
       showPassword: false,
       // 是否显示主题设置抽屉
       showSetting: false,
-      // 是否显示主体部分, 如果你的首页用到了权限控制指令, 把这个改成false, 避免权限控制指令可能不生效
+      // 是否显示主体部分, 如果首页用到了权限控制指令, 把这个改成false, 避免权限控制指令可能不生效
       showContent: true
     };
   },
@@ -117,20 +126,20 @@ export default {
           } else {
             result = res.data;
           }
-          if (res.data.code === 0) {
+          if (result.code === 0) {
             const user = result.data;
             this.$store.dispatch('user/setUser', user);
             this.$store.dispatch('user/setRoles', user ? user.roles : null);
             this.$store.dispatch('user/setAuthorities', user ? user.authorities : null);
-          } else if (res.data.msg) {
-            this.$message.error(res.data.msg);
+          } else if (result.msg) {
+            this.$message.error(result.msg);
           }
           // 在用户权限信息请求完成后再渲染主体部分, 以免权限控制指令不生效
           this.showContent = true;
         }).catch(e => {
+          console.error(e);
           this.showContent = true;
           this.$message.error(e.message);
-          console.error(e);
         });
       }
     },
@@ -165,8 +174,8 @@ export default {
       this.$store.dispatch('theme/setColor', value).then(() => {
         loading.close();
       }).catch(e => {
-        loading.close();
         console.error(e);
+        loading.close();
         this.$message.error('主题加载失败');
       });
     },
@@ -201,6 +210,16 @@ export default {
     /* 移除全部tab */
     tabRemoveAll() {
       this.$store.dispatch('user/tabRemoveAll');
+    },
+    /* 菜单路由国际化对应的名称 */
+    i18n(path, key) {
+      return this.$t('route.' + key + '._name');
+    },
+    /* 切换语言 */
+    changeLanguage(lang) {
+      this.$i18n.locale = lang;
+      this.$refs.layout.changeLanguage();
+      localStorage.setItem('i18n-lang', lang);
     }
   }
 }

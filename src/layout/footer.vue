@@ -5,23 +5,26 @@
       <a
         class="ele-text-secondary"
         href="https://eleadmin.com"
-        target="_blank">官网
+        target="_blank">
+        {{ $t('layout.footer.website') }}
       </a>
       <em/>
       <a
         class="ele-text-secondary"
         href="https://eleadmin.com/doc/eleadmin/"
-        target="_blank">文档
+        target="_blank">
+        {{ $t('layout.footer.document') }}
       </a>
       <em/>
       <a
         class="ele-text-secondary"
         href="https://eleadmin.com/goods/8"
-        target="_blank">授权
+        target="_blank">
+        {{ $t('layout.footer.authorization') }}
       </a>
     </div>
     <div class="ele-text-secondary" style="margin-top: 8px;">
-      Copyright © 2021 武汉易云智科技有限公司
+      {{ $t('layout.footer.copyright') }}
     </div>
   </div>
 </template>

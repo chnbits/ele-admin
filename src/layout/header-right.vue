@@ -1,10 +1,26 @@
 <!-- 顶栏右侧区域按钮 -->
 <template>
   <div class="ele-admin-header-tool">
-    <div
-      class="ele-admin-header-tool-item"
-      @click="toggleFullscreen">
+    <!-- 全屏切换 -->
+    <div class="ele-admin-header-tool-item" @click="toggleFullscreen">
       <i :class="isFullscreen?'el-icon-_screen-restore':'el-icon-_screen-full'"></i>
+    </div>
+    <!-- 语言切换 -->
+    <div class="ele-admin-header-tool-item">
+      <el-dropdown placement="bottom" @command="changeLanguage">
+        <i class="el-icon-_language"></i>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="en">
+            <span :class="{'ele-text-primary': language==='en'}">English</span>
+          </el-dropdown-item>
+          <el-dropdown-item command="zh_CN">
+            <span :class="{'ele-text-primary': language==='zh_CN'}">简体中文</span>
+          </el-dropdown-item>
+          <el-dropdown-item command="zh_TW">
+            <span :class="{'ele-text-primary': language==='zh_TW'}">繁體中文</span>
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
     </div>
     <!-- 消息通知 -->
     <div class="ele-admin-header-tool-item">
@@ -19,27 +35,20 @@
           <i class="el-icon-arrow-down"></i>
         </div>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            command="user"
-            icon="el-icon-user">个人中心
+          <el-dropdown-item command="profile" icon="el-icon-user">
+            {{ $t('layout.header.profile') }}
           </el-dropdown-item>
-          <el-dropdown-item
-            command="password"
-            icon="el-icon-key">修改密码
+          <el-dropdown-item command="password" icon="el-icon-key">
+            {{ $t('layout.header.password') }}
           </el-dropdown-item>
-          <el-dropdown-item
-            command="logout"
-            icon="el-icon-switch-button"
-            divided>退出登录
+          <el-dropdown-item command="logout" icon="el-icon-switch-button" divided>
+            {{ $t('layout.header.logout') }}
           </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
     </div>
     <!-- 主题设置 -->
-    <div
-      class="ele-admin-header-tool-item"
-      v-if="showSetting"
-      @click="openSetting">
+    <div v-if="showSetting" class="ele-admin-header-tool-item" @click="openSetting">
       <i class="el-icon-_more"></i>
     </div>
   </div>
@@ -62,6 +71,10 @@ export default {
     // 当前登录用户信息
     loginUser() {
       return this.$store.state.user.user;
+    },
+    // 当前语言
+    language() {
+      return this.$i18n.locale;
     }
   },
   data() {
@@ -73,17 +86,17 @@ export default {
   methods: {
     /* 个人信息下拉菜单点击 */
     onUserDropClick(command) {
-      if (command === 'user') {
-        if (this.$route.fullPath !== '/user/info') {
-          this.$router.push('/user/info');
+      if (command === 'profile') {
+        if (this.$route.fullPath !== '/user/profile') {
+          this.$router.push('/user/profile');
         }
       } else if (command === 'password') {
         this.$emit('item-click', 'password');
       } else if (command === 'logout') {
         // 退出登录
         this.$confirm(
-          '确定要退出登录吗?',
-          '提示',
+          this.$t('layout.logout.message'),
+          this.$t('layout.logout.title'),
           {type: 'warning'}
         ).then(() => {
           // 清除缓存的token
@@ -105,6 +118,10 @@ export default {
       } catch (e) {
         this.$message.error('您的浏览器不支持全屏模式');
       }
+    },
+    /* 切换语言 */
+    changeLanguage(lang) {
+      this.$emit('change-language', lang);
     }
   }
 }

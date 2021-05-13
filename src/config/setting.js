@@ -6,6 +6,8 @@ export default {
   whiteList: ['/login', '/forget'],
   // 不显示全局页脚的路由地址
   hideFooters: ['/system/dictionary', '/system/organization'],
+  // 不显示侧边栏的路由地址
+  hideSidebars: [],
   // 需要缓存的组件名称
   keepAliveList: [],
   // 菜单数据接口
@@ -20,15 +22,15 @@ export default {
   userUrl: '/main/user',
   // 自定义解析接口用户信息
   parseUser(res) {
-    // 这里code和msg字段如果不一样可在这里修改
+    // 这里code和msg字段如果不一样可在这里修改，code为0是成功
     let result = {code: res.code, msg: res.msg};
     if (res.data) {
-      // 这里只需要姓名和头像两个字段，如需缓存其它字段可在这里添加
+      // 姓名和头像会显示在顶栏，是必须的
       result.data = {
         nickname: res.data.nickname,
         avatar: res.data.avatar
       };
-      // 下面是获取角色和权限列表，需要string数组类型
+      // 下面是获取角色和权限列表，需要String数组类型
       if (res.data.roles) {
         result.data.roles = res.data.roles.map(d => d.roleCode);
       }
