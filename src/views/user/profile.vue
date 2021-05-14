@@ -63,7 +63,7 @@
                 </el-form-item>
                 <el-form-item label="性别:" prop="sex">
                   <el-select
-                    v-model="form.sex"
+                    v-model="form.sexName"
                     placeholder="请选择性别"
                     class="ele-fluid"
                     clearable>
@@ -226,12 +226,21 @@ export default {
     /* 保存更改 */
     save() {
       this.$refs['infoForm'].validate((valid) => {
+        console.log(this.form)
+        // return false
         if (valid) {
           this.loading = true;
-          setTimeout(() => {
+          this.$http.put('/main/profile/'+1,{}).then(res=>{
             this.loading = false;
-            this.$message.success('保存成功');
-          }, 800);
+            if (res.data.code !== 0){
+              this.$message.error('保存失败！')
+            }else{
+              this.$message.success('保存成功！')
+            }
+          }).catch(e=>{
+            this.loading = false;
+            this.$message.error(e.message)
+          })
         } else {
           return false;
         }
