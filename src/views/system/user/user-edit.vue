@@ -29,28 +29,13 @@
               placeholder="请输入用户名"/>
           </el-form-item>
           <el-form-item label="性别:" prop="sex">
-            <el-select
-              clearable
-              class="ele-block"
-              v-model="form.sexName"
-              placeholder="请选择性别">
-              <el-option label="保密" :value="0"/>
-              <el-option label="男" :value="1"/>
-              <el-option label="女" :value="2"/>
+            <el-select clearable class="ele-block" v-model="form.sex" placeholder="请选择性别">
+              <el-option v-for="item in sexList" :key="item.sex" :label="item.sexName" :value="item.sex"/>
             </el-select>
           </el-form-item>
           <el-form-item label="角色:" prop="roleIds">
-            <el-select
-              multiple
-              clearable
-              class="ele-block"
-              v-model="form.roleIds"
-              placeholder="请选择角色">
-              <el-option
-                v-for="item in roleList"
-                :key="item.roleId"
-                :label="item.roleName"
-                :value="item.roleId"/>
+            <el-select multiple clearable class="ele-block" v-model="form.roleIds" placeholder="请选择角色">
+              <el-option v-for="item in roleList" :key="item.roleId" :label="item.roleName" :value="item.roleId"/>
             </el-select>
           </el-form-item>
         </el-col>
@@ -139,7 +124,9 @@ export default {
       // 是否是修改
       isUpdate: false,
       // 角色列表
-      roleList: []
+      roleList: [],
+      //性别列表
+      sexList:[{sex:'0',sexName:'未知'},{sex:'1',sexName:'男'},{sex:'2',sexName:'女'}]
     };
   },
   watch: {
@@ -201,6 +188,7 @@ export default {
         this.$message.error(e.message);
       });
     }
+    // 查询性别列表
   }
 }
 </script>

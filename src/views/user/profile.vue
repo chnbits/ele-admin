@@ -9,26 +9,26 @@
               <i class="el-icon-upload2"></i>
             </div>
             <h2 class="user-info-name">{{form.nickname}}</h2>
-            <div class="user-info-desc">海纳百川，有容乃大</div>
+            <div class="user-info-desc">{{ form.introduction }}</div>
           </div>
-          <div class="user-info-list">
-            <div class="user-info-item">
-              <i class="el-icon-user"></i>
-              <span>资深前端工程师</span>
-            </div>
-            <div class="user-info-item">
-              <i class="el-icon-office-building"></i>
-              <span>某某公司 - 某某事业群 - 某某技术部</span>
-            </div>
-            <div class="user-info-item">
-              <i class="el-icon-location-information"></i>
-              <span>中国 • 浙江省 • 杭州市</span>
-            </div>
-            <div class="user-info-item">
-              <i class="el-icon-_school"></i>
-              <span>JavaScript、HTML、CSS、Vue、Node</span>
-            </div>
-          </div>
+<!--          <div class="user-info-list">-->
+<!--            <div class="user-info-item">-->
+<!--              <i class="el-icon-user"></i>-->
+<!--              <span>资深前端工程师</span>-->
+<!--            </div>-->
+<!--            <div class="user-info-item">-->
+<!--              <i class="el-icon-office-building"></i>-->
+<!--              <span>某某公司 - 某某事业群 - 某某技术部</span>-->
+<!--            </div>-->
+<!--            <div class="user-info-item">-->
+<!--              <i class="el-icon-location-information"></i>-->
+<!--              <span>中国 • 浙江省 • 杭州市</span>-->
+<!--            </div>-->
+<!--            <div class="user-info-item">-->
+<!--              <i class="el-icon-_school"></i>-->
+<!--              <span>JavaScript、HTML、CSS、Vue、Node</span>-->
+<!--            </div>-->
+<!--          </div>-->
           <div style="margin: 30px 0 20px 0;">
             <el-divider class="ele-divider-dashed ele-divider-base"/>
           </div>
@@ -47,68 +47,28 @@
         <el-card shadow="never" body-style="padding-top: 5px;">
           <el-tabs v-model="active" class="user-info-tabs">
             <el-tab-pane label="基本信息" name="info">
-              <el-form
-                ref="infoForm"
-                :model="form"
-                :rules="rules"
-                label-width="90px"
-                style="max-width: 450px;padding-top: 40px;"
-                @keyup.enter.native="save"
-                @submit.native.prevent>
+              <el-form ref="infoForm" :model="form" :rules="rules" label-width="90px" style="max-width: 450px;padding-top: 40px;" @keyup.enter.native="save" @submit.native.prevent>
                 <el-form-item label="昵称:" prop="nickname">
-                  <el-input
-                    v-model="form.nickname"
-                    placeholder="请输入昵称"
-                    clearable/>
+                  <el-input v-model="form.nickname" placeholder="请输入昵称" clearable/>
                 </el-form-item>
                 <el-form-item label="性别:" prop="sex">
-                  <el-select
-                    v-model="form.sexName"
-                    placeholder="请选择性别"
-                    class="ele-fluid"
-                    clearable>
+                  <el-select v-model="form.sexName" placeholder="请选择性别" class="ele-fluid" clearable>
                     <el-option label="保密" :value="0"/>
                     <el-option label="男" :value="1"/>
                     <el-option label="女" :value="2"/>
                   </el-select>
                 </el-form-item>
+                <el-form-item label="联系电话:" prop="phone">
+                  <el-input v-model="form.phone" placeholder="请输入联系电话" clearable/>
+                </el-form-item>
                 <el-form-item label="邮箱:" prop="email">
-                  <el-input
-                    v-model="form.email"
-                    placeholder="请输入邮箱"
-                    clearable/>
+                  <el-input v-model="form.email" placeholder="请输入邮箱" clearable/>
                 </el-form-item>
                 <el-form-item label="个人简介:">
-                  <el-input
-                    v-model="form.introduction"
-                    placeholder="请输入个人简介"
-                    :rows="4"
-                    type="textarea"/>
-                </el-form-item>
-                <el-form-item label="街道地址:">
-                  <el-input
-                    v-model="form.address"
-                    placeholder="请输入街道地址"
-                    clearable/>
-                </el-form-item>
-                <el-form-item label="联系电话:">
-                  <div class="ele-cell">
-                    <el-input
-                      v-model="form.tellPre"
-                      style="width: 65px;"/>
-                    <div class="ele-cell-content">
-                      <el-input
-                        v-model="form.tell"
-                        placeholder="请输入联系电话"
-                        clearable/>
-                    </div>
-                  </div>
+                  <el-input v-model="form.introduction" placeholder="请输入个人简介" :rows="4" type="textarea"/>
                 </el-form-item>
                 <el-form-item>
-                  <el-button
-                    type="primary"
-                    @click="save"
-                    :loading="loading">保存更改
+                  <el-button type="primary" @click="save" :loading="loading">保存更改
                   </el-button>
                 </el-form-item>
               </el-form>
@@ -172,11 +132,7 @@
       </el-col>
     </el-row>
     <!-- 头像裁剪弹窗 -->
-    <ele-cropper-dialog
-      :show.sync="showCropper"
-      @crop="onCrop"
-      :src="form.avatar"
-      :lock-scroll="false"/>
+    <ele-cropper-dialog :show.sync="showCropper" @crop="onCrop" :src="form.avatar" :lock-scroll="false"/>
   </div>
 </template>
 
@@ -200,6 +156,9 @@ export default {
         ],
         sex: [
           {required: true, message: '请选择性别', trigger: 'blur'}
+        ],
+        phone: [
+          {required: true, message: '请输入联系电话', trigger: 'blur'}
         ],
         email: [
           {required: true, message: '请输入邮箱', trigger: 'blur'}
@@ -226,11 +185,9 @@ export default {
     /* 保存更改 */
     save() {
       this.$refs['infoForm'].validate((valid) => {
-        console.log(this.form)
-        // return false
         if (valid) {
           this.loading = true;
-          this.$http.put('/main/profile/'+1,{}).then(res=>{
+          this.$http.put('/main/profile/'+this.form.userId,this.form).then(res=>{
             this.loading = false;
             if (res.data.code !== 0){
               this.$message.error('保存失败！')
