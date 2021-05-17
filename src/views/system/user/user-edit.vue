@@ -1,32 +1,14 @@
 <!-- 用户编辑弹窗 -->
 <template>
-  <el-dialog
-    width="600px"
-    :visible="visible"
-    :lock-scroll="false"
-    :destroy-on-close="true"
-    custom-class="ele-dialog-form"
-    :title="isUpdate?'修改用户':'添加用户'"
-    @update:visible="updateVisible">
-    <el-form
-      ref="form"
-      :model="form"
-      :rules="rules"
-      label-width="82px">
+  <el-dialog width="600px" :visible="visible" :lock-scroll="false" :destroy-on-close="true" custom-class="ele-dialog-form" :title="isUpdate?'修改用户':'添加用户'" @update:visible="updateVisible">
+    <el-form ref="form" :model="form" :rules="rules" label-width="82px">
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="用户账号:" prop="username">
-            <el-input
-              clearable
-              v-model="form.username"
-              placeholder="请输入账号"
-              :disabled="isUpdate"/>
+            <el-input clearable v-model="form.username" placeholder="请输入账号" :disabled="isUpdate"/>
           </el-form-item>
           <el-form-item label="用户名:" prop="nickname">
-            <el-input
-              clearable
-              v-model="form.nickname"
-              placeholder="请输入用户名"/>
+            <el-input clearable v-model="form.nickname" placeholder="请输入用户名"/>
           </el-form-item>
           <el-form-item label="性别:" prop="sex">
             <el-select clearable class="ele-block" v-model="form.sex" placeholder="请选择性别">
@@ -41,31 +23,16 @@
         </el-col>
         <el-col :sm="12">
           <el-form-item label="手机号:" prop="phone">
-            <el-input
-              clearable
-              v-model="form.phone"
-              placeholder="请输入手机号"/>
+            <el-input clearable v-model="form.phone" placeholder="请输入手机号"/>
           </el-form-item>
           <el-form-item label="邮箱:">
-            <el-input
-              clearable
-              v-model="form.email"
-              placeholder="请输入邮箱"/>
+            <el-input clearable v-model="form.email" placeholder="请输入邮箱"/>
           </el-form-item>
           <el-form-item label="个人简介:">
-            <el-input
-              clearable
-              v-model="form.introduction"
-              placeholder="请输入个人简介"/>
+            <el-input clearable v-model="form.introduction" placeholder="请输入个人简介"/>
           </el-form-item>
-          <el-form-item
-            v-if="!isUpdate"
-            label="登录密码:"
-            prop="password">
-            <el-input
-              v-model="form.password"
-              placeholder="请输入登录密码"
-              show-password/>
+          <el-form-item v-if="!isUpdate" label="登录密码:" prop="password">
+            <el-input v-model="form.password" placeholder="请输入登录密码" show-password/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -74,10 +41,7 @@
       <el-button
         @click="updateVisible(false)">取消
       </el-button>
-      <el-button
-        type="primary"
-        :loading="loading"
-        @click="save">保存
+      <el-button type="primary" :loading="loading" @click="save">保存
       </el-button>
     </div>
   </el-dialog>

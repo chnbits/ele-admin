@@ -2,36 +2,21 @@
   <div class="ele-body">
     <el-card shadow="never">
       <!-- 搜索表单 -->
-      <el-form
-        :model="where"
-        label-width="77px"
-        class="ele-form-search"
-        @keyup.enter.native="reload"
-        @submit.native.prevent>
+      <el-form :model="where" label-width="77px" class="ele-form-search" @keyup.enter.native="reload" @submit.native.prevent>
         <el-row :gutter="15">
           <el-col :md="6" :sm="12">
             <el-form-item label="用户账号:">
-              <el-input
-                clearable
-                v-model="where.username"
-                placeholder="请输入"/>
+              <el-input clearable v-model="where.username" placeholder="请输入"/>
             </el-form-item>
           </el-col>
           <el-col :md="6" :sm="12">
             <el-form-item label="用户名:">
-              <el-input
-                clearable
-                v-model="where.nickname"
-                placeholder="请输入"/>
+              <el-input clearable v-model="where.nickname" placeholder="请输入"/>
             </el-form-item>
           </el-col>
           <el-col :md="6" :sm="12">
             <el-form-item label="性别:">
-              <el-select
-                clearable
-                v-model="where.sex"
-                placeholder="请选择"
-                class="ele-fluid">
+              <el-select clearable v-model="where.sex" placeholder="请选择" class="ele-fluid">
                 <el-option label="保密" value="0"/>
                 <el-option label="男" value="1"/>
                 <el-option label="女" value="2"/>
@@ -40,11 +25,7 @@
           </el-col>
           <el-col :md="6" :sm="12">
             <div class="ele-form-actions">
-              <el-button
-                type="primary"
-                icon="el-icon-search"
-                class="ele-btn-icon"
-                @click="reload">查询
+              <el-button type="primary" icon="el-icon-search" class="ele-btn-icon" @click="reload">查询
               </el-button>
               <el-button @click="reset">重置</el-button>
             </div>
@@ -52,84 +33,41 @@
         </el-row>
       </el-form>
       <!-- 数据表格 -->
-      <ele-pro-table
-        ref="table"
-        :where="where"
-        :datasource="url"
-        :columns="columns"
-        :selection.sync="selection">
+      <ele-pro-table ref="table" :where="where" :datasource="url" :columns="columns" :selection.sync="selection">
         <!-- 表头工具栏 -->
         <template slot="toolbar">
-          <el-button
-            @click="openEdit(null)"
-            type="primary"
-            icon="el-icon-plus"
-            class="ele-btn-icon"
-            size="small">添加
+          <el-button @click="openEdit(null)" type="primary" icon="el-icon-plus" class="ele-btn-icon" size="small">添加
           </el-button>
-          <el-button
-            @click="removeBatch"
-            type="danger"
-            icon="el-icon-delete"
-            class="ele-btn-icon"
-            size="small">删除
+          <el-button @click="removeBatch" type="danger" icon="el-icon-delete" class="ele-btn-icon" size="small">删除
           </el-button>
-          <el-button
-            @click="showImport=true"
-            icon="el-icon-upload2"
-            class="ele-btn-icon"
-            size="small">导入
+          <el-button @click="showImport=true" icon="el-icon-upload2" class="ele-btn-icon" size="small">导入
           </el-button>
         </template>
         <!-- 角色列 -->
         <template slot="roles" slot-scope="{row}">
-          <el-tag
-            v-for="item in row.roles"
-            :key="item.roleId"
-            type="primary"
-            size="mini">
+          <el-tag v-for="item in row.roles" :key="item.roleId" type="primary" size="mini">
             {{ item.roleName }}
           </el-tag>
         </template>
         <!-- 状态列 -->
         <template slot="state" slot-scope="{row}">
-          <el-switch
-            :active-value="0"
-            :inactive-value="1"
-            v-model="row.state"
-            @change="editState(row)"/>
+          <el-switch :active-value="0" :inactive-value="1" v-model="row.state" @change="editState(row)"/>
         </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
-          <el-link
-            type="primary"
-            :underline="false"
-            icon="el-icon-edit"
-            @click="openEdit(row)">修改
+          <el-link type="primary" :underline="false" icon="el-icon-edit" @click="openEdit(row)">修改
           </el-link>
-          <el-popconfirm
-            class="ele-action"
-            title="确定要删除此用户吗？"
-            @confirm="remove(row)">
-            <el-link
-              type="danger"
-              slot="reference"
-              :underline="false"
-              icon="el-icon-delete">删除
+          <el-popconfirm class="ele-action" title="确定要删除此用户吗？" @confirm="remove(row)">
+            <el-link type="danger" slot="reference" :underline="false" icon="el-icon-delete">删除
             </el-link>
           </el-popconfirm>
         </template>
       </ele-pro-table>
     </el-card>
     <!-- 编辑弹窗 -->
-    <user-edit
-      :data="current"
-      :visible.sync="showEdit"
-      @done="reload"/>
+    <user-edit :data="current" :visible.sync="showEdit" @done="reload"/>
     <!-- 导入弹窗 -->
-    <user-import
-      :visible.sync="showImport"
-      @done="reload"/>
+    <user-import :visible.sync="showImport" @done="reload"/>
   </div>
 </template>
 
@@ -183,6 +121,13 @@ export default {
         {
           prop: 'phone',
           label: '手机号',
+          sortable: 'custom',
+          showOverflowTooltip: true,
+          minWidth: 110
+        },
+        {
+          prop: 'email',
+          label: '邮箱',
           sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
