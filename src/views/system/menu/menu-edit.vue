@@ -1,51 +1,25 @@
 <!-- 编辑弹窗 -->
 <template>
-  <el-dialog
-    width="720px"
-    :visible="visible"
-    :lock-scroll="false"
-    :destroy-on-close="true"
-    custom-class="ele-dialog-form"
-    :title="isUpdate?'修改菜单':'添加菜单'"
-    @update:visible="updateVisible">
-    <el-form
-      ref="form"
-      :model="form"
-      :rules="rules"
-      label-width="92px"
-      @keyup.enter.native="save"
-      @submit.native.prevent>
+  <el-dialog width="720px" :visible="visible" :lock-scroll="false" :destroy-on-close="true" custom-class="ele-dialog-form" :title="isUpdate?'修改菜单':'添加菜单'" @update:visible="updateVisible">
+    <el-form ref="form" :model="form" :rules="rules" label-width="92px" @keyup.enter.native="save" @submit.native.prevent>
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="上级菜单:">
-            <treeselect
-              :options="menuList"
-              v-model="form.parentId"
-              :defaultExpandLevel="3"
-              :normalizer="normalizer"
-              placeholder="请选择上级菜单"/>
+            <treeselect :options="menuList" v-model="form.parentId" :defaultExpandLevel="3" :normalizer="normalizer" placeholder="请选择上级菜单"/>
           </el-form-item>
           <el-form-item label="菜单名称:" prop="title">
-            <el-input
-              clearable
-              v-model="form.title"
-              placeholder="请输入菜单名称"/>
+            <el-input clearable v-model="form.title" placeholder="请输入菜单名称"/>
           </el-form-item>
         </el-col>
         <el-col :sm="12">
           <el-form-item label="菜单类型:">
-            <el-radio-group
-              v-model="form.menuType"
-              @change="onMenuTypeChange">
+            <el-radio-group v-model="form.menuType" @change="onMenuTypeChange">
               <el-radio :label="0">菜单</el-radio>
               <el-radio :label="1">按钮</el-radio>
             </el-radio-group>
           </el-form-item>
           <el-form-item label="打开方式:">
-            <el-radio-group
-              v-model="form.openType"
-              :disabled="form.menuType === 1"
-              @change="onOpenTypeChange">
+            <el-radio-group v-model="form.openType" :disabled="form.menuType === 1" @change="onOpenTypeChange">
               <el-radio :label="0">组件</el-radio>
               <el-radio :label="1">内链</el-radio>
               <el-radio :label="2">外链</el-radio>
@@ -59,64 +33,36 @@
       <el-row :gutter="15">
         <el-col :sm="12">
           <el-form-item label="菜单图标:">
-            <ele-icon-picker
-              v-model="form.icon"
-              placeholder="请选择菜单图标"
-              :disabled="form.menuType===1"/>
+            <ele-icon-picker v-model="form.icon" placeholder="请选择菜单图标" :disabled="form.menuType===1"/>
           </el-form-item>
           <el-form-item name="path">
             <template slot="label">
-              <el-tooltip
-                v-if="form.openType === 2"
-                placement="top"
-                content="需要以`http://`、`https://`、`//`开头">
+              <el-tooltip v-if="form.openType === 2" placement="top" content="需要以`http://`、`https://`、`//`开头">
                 <i class="el-icon-_question"></i>
               </el-tooltip>
               <span>{{ form.openType === 2 ? ' 外链地址:' : ' 路由地址:' }}</span>
             </template>
-            <el-input
-              clearable
-              v-model="form.path"
-              :disabled="form.menuType===1"
-              :placeholder="form.openType === 2 ? '请输入外链地址' : '请输入路由地址'"/>
+            <el-input clearable v-model="form.path" :disabled="form.menuType===1" :placeholder="form.openType === 2 ? '请输入外链地址' : '请输入路由地址'"/>
           </el-form-item>
           <el-form-item name="component">
             <template slot="label">
-              <el-tooltip
-                v-if="form.openType === 1"
-                placement="top"
-                content="需要以`http://`、`https://`、`//`开头">
+              <el-tooltip v-if="form.openType === 1" placement="top" content="需要以`http://`、`https://`、`//`开头">
                 <i class="el-icon-_question"></i>
               </el-tooltip>
               <span>{{ form.openType === 1 ? ' 内链地址:' : ' 组件路径:' }}</span>
             </template>
-            <el-input
-              clearable
-              v-model="form.component"
-              :disabled="form.menuType === 1 || form.openType === 2"
-              :placeholder="form.openType === 1 ? '请输入内链地址' : '请输入组件路径'"/>
+            <el-input clearable v-model="form.component" :disabled="form.menuType === 1 || form.openType === 2" :placeholder="form.openType === 1 ? '请输入内链地址' : '请输入组件路径'"/>
           </el-form-item>
         </el-col>
         <el-col :sm="12">
           <el-form-item label="权限标识:">
-            <el-input
-              clearable
-              v-model="form.authority"
-              placeholder="请输入权限标识"
-              :disabled="form.menuType === 0"/>
+            <el-input clearable v-model="form.authority" placeholder="请输入权限标识" :disabled="form.menuType === 0"/>
           </el-form-item>
           <el-form-item label="排序号:" prop="sortNumber">
-            <el-input-number
-              :min="0"
-              v-model="form.sortNumber"
-              placeholder="请输入排序号"
-              controls-position="right"
-              class="ele-fluid ele-text-left"/>
+            <el-input-number :min="0" v-model="form.sortNumber" placeholder="请输入排序号" controls-position="right" class="ele-fluid ele-text-left"/>
           </el-form-item>
           <el-form-item label="是否可见:">
-            <el-switch
-              v-model="form.isShow"
-              :disabled="form.menuType === 1"/>
+            <el-switch v-model="form.isShow" :disabled="form.menuType === 1"/>
             <el-tooltip
               placement="top"
               content="选择不可见只注册路由不显示在侧边栏，比如添加页面应该选择不可见">
@@ -128,10 +74,7 @@
     </el-form>
     <div slot="footer">
       <el-button @click="updateVisible(false)">取消</el-button>
-      <el-button
-        type="primary"
-        :loading="loading"
-        @click="save">保存
+      <el-button type="primary" :loading="loading" @click="save">保存
       </el-button>
     </div>
   </el-dialog>

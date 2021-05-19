@@ -68,6 +68,10 @@ export default {
       choose: {_name: '批量选择'},
       iqiyi: {_name: '内嵌页面'}
     },
+    file:{
+      _name:'文件管理',
+      files:{_name:'文件列表'}
+    },
     'https://eleadminCom/goods/8': {_name: '获取授权'},
     'http://wwwBaiduCom':{_name:'跳转页面'}
   },

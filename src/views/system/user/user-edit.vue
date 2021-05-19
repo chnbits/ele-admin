@@ -152,7 +152,6 @@ export default {
         this.$message.error(e.message);
       });
     }
-    // 查询性别列表
   }
 }
 </script>
