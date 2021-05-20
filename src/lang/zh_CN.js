@@ -72,7 +72,7 @@ export default {
       _name:'文件管理',
       files:{_name:'文件列表'}
     },
-    'https://eleadminCom/goods/8': {_name: '获取授权'},
+    'https://err5.com': {_name: '官方站点'},
     'http://wwwBaiduCom':{_name:'跳转页面'}
   },
   layout: {
@@ -86,7 +86,7 @@ export default {
       website: '官网',
       document: '文档',
       authorization: '授权',
-      copyright: 'Copyright © 2021 武汉易云智科技有限公司'
+      copyright: 'Copyright © 2021 XXX有限公司'
     },
     logout: {
       title: '提示',

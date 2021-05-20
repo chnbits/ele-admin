@@ -1,7 +1,7 @@
 <!-- 用户编辑弹窗 -->
 <template>
   <el-dialog width="400px" :visible="visible" :lock-scroll="false" :destroy-on-close="true" custom-class="ele-dialog-form" :title="'新建文件夹'">
-    <el-form ref="form" :model="form" :rules="rules" label-width="82px">
+    <el-form ref="form" :model="form" :rules="rules" label-width="100px">
       <el-row >
         <el-col :sm="24">
           <el-form-item label="文件夹名:" prop="filename">
@@ -23,12 +23,15 @@ export default {
   props: {
     // 弹窗是否打开
     visible: Boolean,
+
+    filePath: {type:String,default:'/'}
   },
   data() {
     return {
       // 表单数据
       form: {
-        filename: ''
+        filename: '',
+        path:''
       },
       // 表单验证规则
       rules: {
@@ -40,10 +43,15 @@ export default {
       loading: false,
     };
   },
+  beforeUpdate() {
+    this.getFilePath()
+  },
   methods: {
+    getFilePath(){
+      this.form.path = this.filePath
+    },
     /* 保存编辑 */
     save() {
-      console.log(this.form)
       this.loading = true;
       this.$http.post('/file/create', this.form).then(res => {
         this.loading = false;

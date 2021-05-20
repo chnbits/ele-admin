@@ -18,7 +18,7 @@
       <em/>
       <a
         class="ele-text-secondary"
-        href="https://eleadmin.com/goods/8"
+        href="https://err5.com/"
         target="_blank">
         {{ $t('layout.footer.authorization') }}
       </a>

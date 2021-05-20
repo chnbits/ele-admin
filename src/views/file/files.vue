@@ -54,15 +54,10 @@
         <!-- 文件目录面包屑 -->
         <div class="ele-file-breadcrumb-group ele-cell">
           <div class="ele-cell-content ele-cell">
-            <div
-              v-if="directory.length"
-              class="ele-file-breadcrumb-back ele-text-primary"
-              @click="back">返回上一级
+            <div v-if="directory.length" class="ele-file-breadcrumb-back ele-text-primary" @click="back">返回上一级
             </div>
             <div class="ele-file-breadcrumb-list ele-cell-content ele-cell">
-              <div
-                :class="['ele-file-breadcrumb-item ele-cell', {'ele-text-primary': directory.length}]"
-                @click="listAll">
+              <div :class="['ele-file-breadcrumb-item ele-cell', {'ele-text-primary': directory.length}]" @click="listAll">
                 <div class="ele-file-breadcrumb-item-title">全部文件</div>
                 <i v-if="directory.length" class="el-icon-arrow-right"></i>
               </div>
@@ -96,7 +91,7 @@
     <!-- 用于图片预览 -->
     <el-image ref="previewImage" v-if="currentImage" :src="currentImage" class="ele-file-image-preview" :preview-src-list="previewList"></el-image>
 <!--    添加文件夹-->
-    <file-edit :visible.sync="showEdit" @done="reload"/>
+    <file-edit :filePath="path" :visible.sync="showEdit" @done="reload"/>
   </div>
 </template>
 
@@ -129,6 +124,8 @@ export default {
       order: '',
       // 是否显示编辑弹窗
       showEdit: false,
+
+      path: ''
     };
   },
   computed: {
@@ -143,7 +140,11 @@ export default {
   methods: {
     /*创建文件夹*/
     openEdit() {
-      // this.current = row;
+      let dir = '';
+      this.directory.forEach(function (item){
+          dir += '/'+item;
+      })
+      this.path = dir.substring(1);
       this.showEdit = true;
     },
     /* 查询文件列表 */
@@ -209,7 +210,7 @@ export default {
     },
     //刷新
     reload(){
-      location.reload();
+      this.query()
     },
     /* 全部文件 */
     listAll() {
@@ -279,7 +280,7 @@ export default {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});
-          this.directory = [res.dir.replace(/\//, '')];
+          // this.directory = [res.dir.replace(/\//, '')];
           this.query();
         } else {
           this.$message.error(res.data.msg);
