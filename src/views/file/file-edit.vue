@@ -1,6 +1,6 @@
 <!-- 用户编辑弹窗 -->
 <template>
-  <el-dialog width="400px" :visible="visible" :lock-scroll="false" :destroy-on-close="true" custom-class="ele-dialog-form" :title="'新建文件夹'">
+  <el-dialog width="400px" :visible="visible" :lock-scroll="false" :destroy-on-close="true" custom-class="ele-dialog-form" @close="closeDiag(false)" :title="'新建文件夹'">
     <el-form ref="form" :model="form" :rules="rules" label-width="100px">
       <el-row >
         <el-col :sm="24">
@@ -58,6 +58,7 @@ export default {
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});
           this.updateVisible(false);
+          this.form.filename = '';
           this.$emit('done');
         } else {
           this.$message.error(res.data.msg);
@@ -71,6 +72,9 @@ export default {
     updateVisible(value) {
       this.$emit('update:visible', value);
     },
+    closeDiag(done){
+      this.updateVisible(done);
+    }
   },
 }
 

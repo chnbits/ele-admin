@@ -8,11 +8,12 @@
             <el-upload action="" :show-file-list="false" :before-upload="beforeUpload" class="ele-inline-block ele-action">
               <el-button size="small" type="primary" class="ele-btn-icon" icon="el-icon-upload2">上传</el-button>
             </el-upload>
+            <el-button size="small" type="primary" class="ele-btn-icon" icon="el-icon-folder-add" @click="openUpload">批量上传</el-button>
             <el-button size="small" class="ele-btn-icon" icon="el-icon-folder-add" @click="openEdit">新建文件夹</el-button>
             <template v-if="checked.length">
               <el-button size="small" icon="el-icon-view" class="ele-btn-icon" :disabled="checked.length>1" @click="view(checked[0])">预览
               </el-button>
-              <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon hidden-xs-only">删除
+              <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon hidden-xs-only" @click="deleteFile(checked)">删除
               </el-button>
             </template>
           </div>
@@ -92,16 +93,18 @@
     <el-image ref="previewImage" v-if="currentImage" :src="currentImage" class="ele-file-image-preview" :preview-src-list="previewList"></el-image>
 <!--    添加文件夹-->
     <file-edit :filePath="path" :visible.sync="showEdit" @done="reload"/>
+    <file-upload :filePath="path" :visible.sync="showUpload" @done="reload"/>
   </div>
 </template>
 
 <script>
 import EleFileList from 'ele-admin/packages/ele-file-list';
 import FileEdit from './file-edit';
+import FileUpload from './file-upload';
 
 export default {
   name: 'ExtensionFile',
-  components: {EleFileList,FileEdit},
+  components: {EleFileList,FileEdit,FileUpload},
   data() {
     return {
       // 加载状态
@@ -122,10 +125,14 @@ export default {
       sort: '',
       // 排序方式
       order: '',
+      //文件夹路径
+      path: '',
       // 是否显示编辑弹窗
       showEdit: false,
 
-      path: ''
+      showUpload:false,
+
+
     };
   },
   computed: {
@@ -138,6 +145,15 @@ export default {
     this.query();
   },
   methods: {
+    /*批量上传*/
+    openUpload(){
+      let dir = '';
+      this.directory.forEach(function (item){
+        dir += '/'+item;
+      })
+      this.path = dir.substring(1);
+      this.showUpload = true;
+    },
     /*创建文件夹*/
     openEdit() {
       let dir = '';
@@ -170,6 +186,7 @@ export default {
               url: d.url ? (baseURL + '/' + d.url) : d.url,
               thumbnail: d.thumbnail ? (baseURL + '/' + d.thumbnail) : d.thumbnail,
               length: d.isDirectory ? '-' : this.getFileSize(d.length),
+              directory:d.directory,
               updateTime: this.$util.toDateString(d.updateTime)
             });
           });
@@ -290,6 +307,19 @@ export default {
         this.$message.error(e.message);
       });
       return false;
+    },
+    /*删除*/
+    deleteFile(items){
+      this.$confirm('确认要删除选中项？').then(()=>{
+        this.$http.post('/file/delete',items).then(res=>{
+          if (res.data.code === 0){
+            this.$message.success(res.data.msg)
+            this.query();
+          }else{
+            this.$message.error(res.data.msg)
+          }
+        })
+      })
     }
   }
 }

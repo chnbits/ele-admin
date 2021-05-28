@@ -115,17 +115,9 @@
       </div>
       <!-- 文件列表 -->
       <div v-loading="loading" style="min-height: 400px;">
-        <ele-file-list
-          :data="data"
-          :grid="grid"
-          :sort="sort"
-          :order="order"
-          :checked.sync="checked"
-          @item-click="onItemClick"
-          @sort-change="onSortChange">
+        <ele-file-list :data="data" :grid="grid" :sort="sort" :order="order" :checked.sync="checked" @item-click="onItemClick" @sort-change="onSortChange">
           <template slot="tool" slot-scope="{item}">
-            <i
-              title="查看"
+            <i title="查看"
               class="el-icon-view ele-file-list-item-tool ele-text-primary"
               @click.stop="view(item)">
             </i>
