@@ -310,7 +310,7 @@ export default {
     },
     /*删除*/
     deleteFile(items){
-      this.$confirm('确认要删除选中项？').then(()=>{
+      this.$confirm('删除后文件夹包含内部文件将无法恢复！确认要删除选中项？').then(()=>{
         this.$http.post('/file/delete',items).then(res=>{
           if (res.data.code === 0){
             this.$message.success(res.data.msg)
