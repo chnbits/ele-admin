@@ -46,7 +46,8 @@ export default {
             param.append('file'+index,item.raw)
           })
       }else{
-        that.$message.warning("当前没有合适文件可以上传");
+        that.$message.warning("请选择需要上传的文件！");
+        return
       }
       param.append('path',this.filePath)
       this.$http.post('file/uploads',param,config).then(res=>{
