@@ -73,7 +73,7 @@
       </div>
       <!-- 文件列表 -->
       <div v-loading="loading" style="min-height: 400px;">
-        <ele-file-list :data="data" :grid="grid" :sort="sort" :order="order" :checked.sync="checked" @item-click="onItemClick" @sort-change="onSortChange">
+        <ele-file-list :icons="icons" :smIcons="smIcons" :data="data" :grid="grid" :sort="sort" :order="order" :checked.sync="checked" @item-click="onItemClick" @sort-change="onSortChange">
           <template slot="tool" slot-scope="{item}">
             <i title="查看" class="el-icon-view ele-file-list-item-tool ele-text-primary" @click.stop="view(item)"></i>
             <i title="分享" class="el-icon-share ele-file-list-item-tool ele-text-primary"></i>
@@ -132,7 +132,9 @@ export default {
 
       showUpload:false,
 
+      icons:[],
 
+      smIcons:[],
     };
   },
   computed: {
@@ -169,6 +171,10 @@ export default {
       this.data = [];
       this.checked = [];
       this.loading = true;
+      this.$http.get('/file/icons').then(i=>{
+        this.icons = i.data.icons;
+        this.smIcons = i.data.smIcons;
+      })
       this.$http.get('/file/list', {
         params: {
           sort: this.sort,
