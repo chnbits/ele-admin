@@ -101,7 +101,7 @@ import FileEdit from './file-edit';
 import FileUpload from './file-upload';
 
 export default {
-  name: 'ExtensionFile',
+  name: 'FileManage',
   components: {EleFileList,FileEdit,FileUpload},
   data() {
     return {
