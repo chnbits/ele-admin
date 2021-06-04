@@ -1,31 +1,12 @@
 <!-- 角色权限分配弹窗 -->
 <template>
-  <el-dialog
-    title="分配权限"
-    :visible="visible"
-    width="400px"
-    :destroy-on-close="true"
-    :lock-scroll="false"
-    @update:visible="updateVisible">
-    <el-scrollbar
-      v-loading="authLoading"
-      style="height: 50vh;"
-      wrapStyle="overflow-x: hidden;">
-      <el-tree
-        ref="tree"
-        :data="authData"
-        :props="{label: 'title'}"
-        node-key="menuId"
-        :default-expand-all="true"
-        :default-checked-keys="checked"
-        show-checkbox/>
+  <el-dialog title="分配权限" :visible="visible" width="400px" :destroy-on-close="true" :lock-scroll="false" @update:visible="updateVisible">
+    <el-scrollbar v-loading="authLoading" style="height: 50vh;" wrapStyle="overflow-x: hidden;">
+      <el-tree ref="tree" :data="authData" :props="{label: 'title'}" node-key="menuId" :default-expand-all="true" :default-checked-keys="checked" show-checkbox/>
     </el-scrollbar>
     <div slot="footer">
       <el-button @click="updateVisible(false)">取消</el-button>
-      <el-button
-        type="primary"
-        @click="save"
-        :loading="loading">保存
+      <el-button type="primary" @click="save" :loading="loading">保存
       </el-button>
     </div>
   </el-dialog>

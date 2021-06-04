@@ -1,47 +1,20 @@
 <!-- 角色编辑弹窗 -->
 <template>
-  <el-dialog
-    :title="isUpdate?'修改角色':'添加角色'"
-    :visible="visible"
-    width="400px"
-    :destroy-on-close="true"
-    :lock-scroll="false"
-    @update:visible="updateVisible">
-    <el-form
-      ref="form"
-      :model="form"
-      :rules="rules"
-      label-width="82px">
-      <el-form-item
-        label="角色名称:"
-        prop="roleName">
-        <el-input
-          v-model="form.roleName"
-          placeholder="请输入角色名称"
-          clearable/>
+  <el-dialog :title="isUpdate?'修改角色':'添加角色'" :visible="visible" width="400px" :destroy-on-close="true" :lock-scroll="false" @update:visible="updateVisible">
+    <el-form ref="form" :model="form" :rules="rules" label-width="82px">
+      <el-form-item label="角色名称:" prop="roleName">
+        <el-input v-model="form.roleName" placeholder="请输入角色名称" clearable/>
       </el-form-item>
-      <el-form-item
-        label="角色标识:"
-        prop="roleCode">
-        <el-input
-          v-model="form.roleCode"
-          placeholder="请输入角色标识"
-          clearable/>
+      <el-form-item label="角色标识:" prop="roleCode">
+        <el-input v-model="form.roleCode" placeholder="请输入角色标识" clearable/>
       </el-form-item>
       <el-form-item label="备注:">
-        <el-input
-          v-model="form.comments"
-          placeholder="请输入备注"
-          :rows="4"
-          type="textarea"/>
+        <el-input v-model="form.comments" placeholder="请输入备注" :rows="4" type="textarea"/>
       </el-form-item>
     </el-form>
     <div slot="footer">
       <el-button @click="updateVisible(false)">取消</el-button>
-      <el-button
-        type="primary"
-        @click="save"
-        :loading="loading">保存
+      <el-button type="primary" @click="save" :loading="loading">保存
       </el-button>
     </div>
   </el-dialog>

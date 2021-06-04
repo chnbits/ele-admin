@@ -40,7 +40,7 @@
           </el-button>
           <el-button @click="removeBatch" type="danger" icon="el-icon-delete" class="ele-btn-icon" size="small">删除
           </el-button>
-          <el-button @click="showImport=true" icon="el-icon-upload2" class="ele-btn-icon" size="small">导入
+          <el-button @click="showImport=true" v-role="'admin'" icon="el-icon-upload2" class="ele-btn-icon" size="small">导入
           </el-button>
         </template>
         <!-- 角色列 -->
@@ -193,11 +193,17 @@ export default {
     },
     /* 显示编辑 */
     openEdit(row) {
+      if (!this.$hasPermission(row!==null?'sys:user:edit':'sys:user:add')){
+        return this.$message.warning('没有权限！');
+      }
       this.current = row;
       this.showEdit = true;
     },
     /* 删除 */
     remove(row) {
+      if (!this.$hasPermission('sys:user:delete')){
+        return this.$message.warning('没有权限！');
+      }
       const loading = this.$loading({lock: true});
       this.$http.post('/sys/user/' + row.userId).then(res => {
         loading.close();
@@ -214,8 +220,11 @@ export default {
     },
     /* 批量删除 */
     removeBatch() {
+      if (!this.$hasPermission('sys:user:delete')){
+        return this.$message.warning('没有权限！');
+      }
       if (!this.selection.length) {
-        this.$message.error('请至少选择一条数据')
+        this.$message.error('请至少选择一条数据!')
         return;
       }
       this.$confirm('确定要删除选中的用户吗?', '提示', {
@@ -241,9 +250,10 @@ export default {
     },
     /* 更改状态 */
     editState(row) {
+      if (!this.$hasPermission('sys:user:edit')){
+        return this.$message.warning('没有权限！');
+      }
       const loading = this.$loading({lock: true});
-      // let params = new FormData();
-      // params.append('state', row.state);
       this.$http.put('/sys/user/state/' + row.userId, {'state':row.state}).then(res => {
         loading.close();
         if (res.data.code === 0) {

@@ -11,10 +11,8 @@
             <el-button size="small" type="primary" class="ele-btn-icon" icon="el-icon-folder-add" @click="openUpload">批量上传</el-button>
             <el-button size="small" class="ele-btn-icon" icon="el-icon-folder-add" @click="openEdit">新建文件夹</el-button>
             <template v-if="checked.length">
-              <el-button size="small" icon="el-icon-view" class="ele-btn-icon" :disabled="checked.length>1" @click="view(checked[0])">预览
-              </el-button>
-              <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon hidden-xs-only" @click="deleteFile(checked)">删除
-              </el-button>
+              <el-button size="small" icon="el-icon-view" class="ele-btn-icon" :disabled="checked.length>1" @click="view(checked[0])">预览</el-button>
+              <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon hidden-xs-only" @click="deleteFile(checked)">删除</el-button>
             </template>
           </div>
           <div class="ele-table-tool-right">
@@ -149,6 +147,9 @@ export default {
   methods: {
     /*批量上传*/
     openUpload(){
+      if (!this.$hasPermission('file:files:upload')){
+        return this.$message.warning('没有权限！');
+      }
       let dir = '';
       this.directory.forEach(function (item){
         dir += '/'+item;
@@ -158,6 +159,9 @@ export default {
     },
     /*创建文件夹*/
     openEdit() {
+      if (!this.$hasPermission('file:files:folder')){
+        return this.$message.warning('没有权限！');
+      }
       let dir = '';
       this.directory.forEach(function (item){
           dir += '/'+item;
@@ -289,6 +293,9 @@ export default {
     },
     /* 上传 */
     beforeUpload(file) {
+      if (!this.$hasPermission('file:files:upload')){
+        return this.$message.warning('没有权限！');
+      }
       const loading = this.$loading({
         lock: true,
         text: '正在上传中',
@@ -316,6 +323,9 @@ export default {
     },
     /*删除*/
     deleteFile(items){
+      if (!this.$hasPermission('file:files:delete')){
+        return this.$message.warning('没有权限！');
+      }
       this.$confirm('删除后文件夹包含内部文件将无法恢复！确认要删除选中项？').then(()=>{
         this.$http.post('/file/delete',items).then(res=>{
           if (res.data.code === 0){
