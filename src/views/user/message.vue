@@ -1,66 +1,38 @@
 <template>
   <div class="ele-body">
-    <el-card shadow="never" body-style="padding:0;">
+    <el-card shadow="never" body-style="padding: 0;">
       <div class="ele-cell ele-cell-align-top ele-user-message">
-        <el-menu
-          :default-active="active"
-          :mode="mode"
-          @select="query">
-          <el-menu-item index="0">
+        <el-menu :mode="mode" :default-active="active" @select="changeType">
+          <el-menu-item index="all">
             <span>全部消息</span>
-            <el-badge
-              v-if="allUnReadNum"
-              :value="allUnReadNum"
-              class="ele-badge-static"/>
+            <el-badge v-if="unReadNumAll" :value="unReadNumAll" class="ele-badge-static"/>
           </el-menu-item>
-          <el-menu-item index="1">
+          <el-menu-item index="notice">
             <span>系统通知</span>
-            <el-badge
-              v-if="unReadNum1"
-              :value="unReadNum1"
-              class="ele-badge-static"/>
+            <el-badge v-if="unReadNum1" :value="unReadNum1" class="ele-badge-static"/>
           </el-menu-item>
-          <el-menu-item index="2">
+          <el-menu-item index="message">
             <span>用户私信</span>
-            <el-badge
-              v-if="unReadNum2"
-              :value="unReadNum2"
-              class="ele-badge-static"/>
+            <el-badge v-if="unReadNum2" :value="unReadNum2" class="ele-badge-static"/>
           </el-menu-item>
-          <el-menu-item index="3">
+          <el-menu-item index="todo">
             <span>代办事项</span>
-            <el-badge
-              v-if="unReadNum3"
-              :value="unReadNum3"
-              class="ele-badge-static"/>
+            <el-badge v-if="unReadNum3" :value="unReadNum3" class="ele-badge-static"/>
           </el-menu-item>
         </el-menu>
         <div class="ele-cell-content">
           <!-- 数据表格 -->
           <ele-pro-table
             ref="table"
+            :loading="loading"
             :datasource="data"
             :columns="columns"
-            :selection.sync="choose">
+            :selection.sync="selection"
+            @refresh="query">
             <template slot="toolbar">
-              <el-button
-                size="small"
-                @click="read"
-                type="primary"
-                plain>标记已读
-              </el-button>
-              <el-button
-                size="small"
-                @click="readAll"
-                type="primary"
-                plain>全部已读
-              </el-button>
-              <el-button
-                size="small"
-                @click="remove()"
-                type="danger"
-                plain>删除消息
-              </el-button>
+              <el-button size="small" type="primary" @click="read">标记已读</el-button>
+              <el-button size="small" type="primary" @click="readAll">全部已读</el-button>
+              <el-button size="small" type="danger" @click="remove()">删除消息</el-button>
             </template>
             <template slot="state" slot-scope="{row}">
               <span :class="['ele-text-danger','ele-text-info'][row.state]">
@@ -69,19 +41,19 @@
             </template>
             <template slot="action" slot-scope="{row}">
               <el-link
-                @click="view(row)"
-                icon="el-icon-view"
                 type="primary"
-                :underline="false">查看
+                :underline="false"
+                icon="el-icon-view"
+                @click="view(row)">查看
               </el-link>
               <el-popconfirm
+                class="ele-action"
                 title="确定要删除此消息吗？"
-                @confirm="remove(row)"
-                class="ele-action">
+                @confirm="remove(row)">
                 <el-link
+                  type="danger"
                   slot="reference"
                   icon="el-icon-delete"
-                  type="danger"
                   :underline="false">删除
                 </el-link>
               </el-popconfirm>
@@ -99,9 +71,10 @@ export default {
   data() {
     return {
       // 导航选中
-      active: '0',
+      active: 'all',
       // 列表显示数据
       data: [],
+      // 表格列配置
       columns: [
         {
           columnKey: 'selection',
@@ -151,189 +124,11 @@ export default {
         }
       ],
       // 列表选中数据
-      choose: [],
+      selection: [],
       // 全部数据
-      allData: [
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: '你有两条任务待完成，不要忘了哦~',
-          type: 3,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'Jasmine给你发来了一条私信',
-          type: 2,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 0
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1, time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 1
-        },
-        {
-          title: 'EleAdmin新版本发布，欢迎体验',
-          type: 1,
-          time: '2020-07-24 11:35',
-          state: 1
-        }
-      ]
+      allData: [],
+      // 加载状态
+      loading: true
     };
   },
   computed: {
@@ -342,76 +137,107 @@ export default {
       return this.$store.state.theme.screenWidth < 768 ? 'horizontal' : 'vertical';
     },
     // 全部未读数量
-    allUnReadNum() {
-      return this.allData.filter(d => d.state === 0).length;
+    unReadNumAll() {
+      return this.allData.filter((d) => d.state === 0).length;
     },
     // 通知未读数量
     unReadNum1() {
-      return this.allData.filter(d => d.state === 0 && d.type === 1).length;
+      return this.allData.filter((d) => d.state === 0 && d.type === 'notice').length;
     },
     // 私信未读数量
     unReadNum2() {
-      return this.allData.filter(d => d.state === 0 && d.type === 2).length;
+      return this.allData.filter((d) => d.state === 0 && d.type === 'message').length;
     },
     // 代办未读数量
     unReadNum3() {
-      return this.allData.filter(d => d.state === 0 && d.type === 3).length;
+      return this.allData.filter((d) => d.state === 0 && d.type === 'todo').length;
     }
   },
   mounted() {
+    const type = this.$route.query.type;
+    if (type) {
+      this.active = type;
+    }
     this.query();
   },
   methods: {
-    /* 查询数据 */
-    query(index) {
-      this.active = index || '0';
-      if (this.active === '0') {
-        this.data = this.allData;
-      } else {
-        this.data = this.allData.filter(d => String(d.type) === this.active);
+    /* 查询全部数据 */
+    query() {
+      this.loading = true;
+      this.$http.get('https://cdn.eleadmin.com/20200609/message.json').then((res) => {
+        this.loading = false;
+        if (res.data.code === 0) {
+          this.allData = res.data.data;
+          this.changeType();
+        } else {
+          this.$message.error(res.data.msg);
+        }
+      }).catch((e) => {
+        this.loading = false;
+        this.$message.error(e.message);
+      });
+    },
+    /* 切换消息类型 */
+    changeType(index) {
+      if (index) {
+        this.active = index;
       }
+      if (this.active === 'all') {
+        this.data = [].concat(this.allData);
+      } else {
+        this.data = this.allData.filter((d) => d.type === this.active);
+      }
+      this.selection = [];
     },
     /* 查看 */
     view(row) {
-      console.log(row);
-      this.$message('点击了查看');
+      this.$message.info(row.title);
     },
-    /* 删除 */
+    /* 删除单个 */
     remove(row) {
-      if (row) {
-        // 单个删除
-        this.data.splice(this.data.indexOf(row), 1);
-        this.$message({type: 'success', message: '删除成功'});
-      } else {
-        // 批量删除
-        if (this.choose.length === 0) {
-          return this.$message.error('请至少选择一条数据');
-        }
-        this.$confirm('确定要删除选中的消息吗?', '提示', {
-          type: 'warning'
-        }).then(() => {
-          this.choose.forEach(d => {
-            this.data.splice(this.data.indexOf(d), 1);
-          });
-          this.$message({type: 'success', message: '删除成功'});
-        }).catch(() => {
-        });
+      this.allData.splice(this.allData.findIndex((t) => t.id === row.id), 1);
+      this.$message.success('删除成功');
+      this.changeType();
+    },
+    /* 批量删除 */
+    removeBatch() {
+      if (!this.selection.length) {
+        return this.$message.error('请至少选择一条数据');
       }
+      this.$confirm('确定要删除选中的消息吗?', '提示', {
+        type: 'warning'
+      }).then(() => {
+        this.selection.forEach((d) => {
+          this.allData.splice(this.allData.findIndex((t) => t.id === d.id), 1);
+        });
+        this.changeType();
+        this.$message.success('删除成功');
+      }).catch(() => {
+      });
     },
     /* 标记已读 */
     read() {
-      if (this.choose.length === 0) {
+      if (!this.selection.length) {
         return this.$message.error('请至少选择一条数据');
       }
-      this.choose.forEach(d => {
-        this.data[this.data.indexOf(d)].state = 1;
+      this.selection.forEach((d) => {
+        const index = this.allData.findIndex((t) => t.id === d.id);
+        this.allData[index].state = 1;
       });
+      this.changeType();
     },
     /* 全部标记已读 */
     readAll() {
-      this.data.forEach(d => {
+      this.allData.forEach((d) => {
         d.state = 1;
       });
+      this.changeType();
+    }
+  },
+  watch: {
+    $route() {
+      const type = this.$route.query.type;
+      this.changeType(type || 'all');
     }
   }
 }

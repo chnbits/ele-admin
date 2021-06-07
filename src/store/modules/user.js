@@ -2,7 +2,7 @@
  * 登录状态管理
  */
 import axios from 'axios';
-import {util} from 'ele-admin';
+import {formatMenus} from 'ele-admin';
 import setting from '@/config/setting';
 
 export default {
@@ -20,10 +20,12 @@ export default {
     tabs: []
   },
   mutations: {
-    SET: (state, obj) => {
+    // 修改值
+    SET(state, obj) {
       state[obj.key] = obj.value;
     },
-    SET_TOKEN: (state, obj) => {
+    // 修改token
+    SET_TOKEN(state, obj) {
       setting.cacheToken(obj.token, obj.remember);
       state.token = obj.token;
       if (!obj.token) {
@@ -33,9 +35,15 @@ export default {
         setting.cacheUser();
       }
     },
+    // 添加tab
     TAB_PUSH(state, obj) {
-      if (!state.tabs.some(r => r.path === obj.path)) {
+      let i = state.tabs.findIndex((d) => d.key === obj.key);
+      if (i === -1) {
         state.tabs = state.tabs.concat([obj]);
+        return;
+      }
+      if (obj.fullPath !== state.tabs[i].fullPath) {
+        state.tabs = state.tabs.slice(0, i).concat([obj]).concat(state.tabs.slice(i + 1));
       }
     }
   },
@@ -61,7 +69,7 @@ export default {
       commit('SET_TOKEN', {});
     },
     /**
-     * 缓存用户信息
+     * 设置用户信息
      * @param commit
      * @param user {Object} 用户信息
      */
@@ -96,7 +104,7 @@ export default {
     /**
      * 获取用户菜单路由
      * @param commit
-     * @returns {Promise<Object>} {menus: Array, home: String}
+     * @returns {Promise<>} {menus: Array, home: String}
      */
     getMenus({commit}) {
       return new Promise((resolve, reject) => {
@@ -106,7 +114,7 @@ export default {
           return resolve({menus: menus});
         }
         axios.get(setting.menuUrl).then(res => {
-          let result = setting.parseMenu ? setting.parseMenu(res.data) : res.data, home = null;
+          let result = setting.parseMenu ? setting.parseMenu(res.data) : res.data;
           // 获取用户的信息、角色、权限
           if (result.user) {
             setting.cacheUser(result.user);
@@ -118,40 +126,13 @@ export default {
           if (!result.data) {
             return reject(new Error(result.msg));
           }
-          let menus = util.formatTreeData(result.data, (d) => {
-            let item = setting.parseMenuItem ? setting.parseMenuItem(d) : Object.assign({}, d);
-            item.meta = Object.assign({
-              title: item.title,
-              icon: item.icon,
-              hide: item.hide,
-              active: item.active || item.uid,
-              hideFooter: item.hideFooter,
-              hideSidebar: item.hideSidebar
-            }, item.meta);
-            if (!item.children || !item.children.length) {
-              if (!home && item.path && !(
-                item.path.startsWith('http://') ||
-                item.path.startsWith('https://') ||
-                item.path.startsWith('//')
-              )) {
-                home = item.path;
-                if (!setting.homeTitle) {
-                  setting.homeTitle = item.title;
-                }
-              }
-            } else if (item.children[0].path) {
-              if (!item.redirect) {
-                item.redirect = item.children[0].path;
-              }
-              if (!item.path) {
-                const cp = item.children[0].path;
-                item.path = cp.substring(0, cp.lastIndexOf('/'));
-              }
-            }
-            return item;
-          });
+          // formatMenus方法主要用于把接口的菜单数据转成带有meta格式的数据
+          const {menus, homePath, homeTitle} = formatMenus(result.data, setting.parseMenuItem);
+          if (!setting.homeTitle) {
+            setting.homeTitle = homeTitle;
+          }
           commit('SET', {key: 'menus', value: menus});
-          resolve({menus: menus, home: home});
+          resolve({menus: menus, home: homePath});
         }).catch(e => {
           reject(e);
         });
@@ -169,21 +150,22 @@ export default {
      * 关闭指定tab
      * @param commit
      * @param state
-     * @param path {String} tab路由
-     * @returns {Promise<Number>} 前一个tab位置
+     * @param key {String}
+     * @returns {Promise<>}
      */
-    tabRemove({commit, state}, path) {
+    tabRemove({commit, state}, key) {
       return new Promise((resolve) => {
-        let lastIndex = -1, lastPath, last;
+        let index = -1, lastIndex = -1, lastPath, last;
         for (let i = 0; i < state.tabs.length; i++) {
-          if (state.tabs[i].path === path) {
+          if (state.tabs[i].key === key || state.tabs[i].fullPath === key) {
+            index = i;
             break;
           }
           lastIndex = i;
           last = state.tabs[i];
-          lastPath = last.path;
+          lastPath = last.fullPath;
         }
-        commit('SET', {key: 'tabs', value: state.tabs.filter(d => d.path !== path)});
+        commit('SET', {key: 'tabs', value: state.tabs.filter((d, i) => i !== index)});
         resolve({lastIndex: lastIndex, lastPath: lastPath, last: last});
       });
     },
@@ -198,11 +180,11 @@ export default {
      * 关闭左侧tab
      * @param commit
      * @param state
-     * @param path {String} tab路由
+     * @param key {String}
      */
-    tabRemoveLeft({commit, state}, path) {
+    tabRemoveLeft({commit, state}, key) {
       for (let i = 0; i < state.tabs.length; i++) {
-        if (state.tabs[i].path === path) {
+        if (state.tabs[i].key === key) {
           commit('SET', {key: 'tabs', value: state.tabs.slice(i)});
           break;
         }
@@ -212,11 +194,11 @@ export default {
      * 关闭右侧tab
      * @param commit
      * @param state
-     * @param path {String} tab路由
+     * @param key {String}
      */
-    tabRemoveRight({commit, state}, path) {
+    tabRemoveRight({commit, state}, key) {
       for (let i = 0; i < state.tabs.length; i++) {
-        if (state.tabs[i].path === path) {
+        if (state.tabs[i].key === key) {
           commit('SET', {key: 'tabs', value: state.tabs.slice(0, i + 1)});
           break;
         }
@@ -226,28 +208,35 @@ export default {
      * 关闭其他tab
      * @param commit
      * @param state
-     * @param path {String} tab路由
+     * @param key {String}
      */
-    tabRemoveOther({commit, state}, path) {
-      commit('SET', {key: 'tabs', value: state.tabs.filter(d => d.path === path)});
+    tabRemoveOther({commit, state}, key) {
+      commit('SET', {key: 'tabs', value: state.tabs.filter((d) => d.key === key)});
     },
     /**
      * 修改指定tab标题
      * @param commit
      * @param state
-     * @param obj {{path: String, title: String, closable: Boolean}}
+     * @param obj {{path: String, title: String, fullPath: String, closable: Boolean}}
      */
     tabSetTitle({commit, state}, obj) {
-      let i = state.tabs.findIndex(d => d.path === obj.path),
-        data = Object.assign({}, state.tabs[i]);
-      if (typeof obj.title !== 'undefined') {
-        data.title = obj.title;
+      let i = -1;
+      if (obj.fullPath) {
+        i = state.tabs.findIndex((d) => d.fullPath === obj.fullPath);
+      } else if (obj.path) {
+        i = state.tabs.findIndex((d) => d.path === obj.path);
       }
-      if (typeof obj.closable !== 'undefined') {
-        data.closable = obj.closable;
+      if (i !== -1) {
+        const data = Object.assign({}, state.tabs[i]);
+        if (typeof obj.title !== 'undefined') {
+          data.title = obj.title;
+        }
+        if (typeof obj.closable !== 'undefined') {
+          data.closable = obj.closable;
+        }
+        const tabs = state.tabs.slice(0, i).concat([data]).concat(state.tabs.slice(i + 1));
+        commit('SET', {key: 'tabs', value: tabs});
       }
-      let tabs = state.tabs.slice(0, i).concat([data]).concat(state.tabs.slice(i + 1));
-      commit('SET', {key: 'tabs', value: tabs});
     }
   }
 }

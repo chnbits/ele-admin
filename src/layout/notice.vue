@@ -2,31 +2,20 @@
 <template>
   <el-popover
     width="300"
-    v-model="visible"
     trigger="click"
-    popper-class="ele-notice-pop"
+    v-model="visible"
+    class="ele-notice-group"
     transition="el-zoom-in-top"
-    class="ele-notice-group">
-    <div
-      class="ele-notice-group"
-      slot="reference">
-      <el-badge
-        :value="allNum"
-        :hidden="!allNum">
+    popper-class="ele-notice-pop">
+    <div slot="reference" class="ele-notice-group">
+      <el-badge :value="allNum" :hidden="!allNum">
         <i class="el-icon-bell"></i>
       </el-badge>
     </div>
-    <el-tabs
-      v-model="active"
-      class="user-info-tabs">
-      <el-tab-pane
-        :label="noticeLabel"
-        name="notice">
+    <el-tabs v-model="active" class="user-info-tabs">
+      <el-tab-pane name="notice" :label="noticeLabel">
         <div class="ele-notice-list ele-scrollbar-mini">
-          <div
-            v-for="(item,index) in notice"
-            :key="index"
-            class="ele-notice-item">
+          <div v-for="(item, index) in notice" :key="index" class="ele-notice-item">
             <div class="ele-cell ele-notice-item-wrapper">
               <i :class="[item.icon,'ele-notice-item-icon']"></i>
               <div class="ele-cell-content">
@@ -37,37 +26,18 @@
             <el-divider/>
           </div>
         </div>
-        <div
-          v-if="notice.length"
-          class="ele-cell ele-notice-actions">
-          <div
-            @click="clear(1)"
-            class="ele-cell-content">清空通知
-          </div>
-          <el-divider
-            direction="vertical"
-            class="line-color-light"/>
-          <div
-            @click="more(1)"
-            class="ele-cell-content">查看更多
-          </div>
+        <div v-if="notice.length" class="ele-cell ele-notice-actions">
+          <div class="ele-cell-content" @click="clear('notice')">清空通知</div>
+          <el-divider direction="vertical" class="line-color-light"/>
+          <div class="ele-cell-content" @click="more('notice')">查看更多</div>
         </div>
-        <ele-empty
-          v-if="!notice.length"
-          text="你已查看所有通知"/>
+        <ele-empty v-if="!notice.length" text="你已查看所有通知"/>
       </el-tab-pane>
-      <el-tab-pane
-        :label="messageLabel"
-        name="message">
+      <el-tab-pane name="message" :label="messageLabel">
         <div class="ele-notice-list ele-scrollbar-mini">
-          <div
-            v-for="(item,index) in message"
-            :key="index"
-            class="ele-notice-item">
+          <div v-for="(item, index) in message" :key="index" class="ele-notice-item">
             <div class="ele-cell ele-notice-item-wrapper ele-cell-align-top">
-              <el-avatar
-                :src="item.avatar"
-                size="medium"/>
+              <el-avatar :src="item.avatar" size="medium"/>
               <div class="ele-cell-content">
                 <div class="ele-elip">{{ item.title }}</div>
                 <div class="ele-text-secondary ele-elip">{{ item.content }}</div>
@@ -77,37 +47,20 @@
             <el-divider/>
           </div>
         </div>
-        <div
-          v-if="message.length"
-          class="ele-cell ele-notice-actions">
-          <div
-            @click="clear(2)"
-            class="ele-cell-content">清空消息
-          </div>
-          <el-divider
-            direction="vertical"
-            class="line-color-light"/>
-          <div
-            @click="more(2)"
-            class="ele-cell-content">查看更多
-          </div>
+        <div v-if="message.length" class="ele-cell ele-notice-actions">
+          <div class="ele-cell-content" @click="clear('message')">清空消息</div>
+          <el-divider direction="vertical" class="line-color-light"/>
+          <div class="ele-cell-content" @click="more('message')">查看更多</div>
         </div>
-        <ele-empty
-          v-if="!message.length"
-          text="你已读完所有私信"/>
+        <ele-empty v-if="!message.length" text="你已读完所有私信"/>
       </el-tab-pane>
       <el-tab-pane :label="todoLabel" name="todo">
         <div class="ele-notice-list ele-scrollbar-mini">
-          <div
-            v-for="(item,index) in todo"
-            :key="index"
-            class="ele-notice-item">
+          <div v-for="(item, index) in todo" :key="index" class="ele-notice-item">
             <div class="ele-notice-item-wrapper">
               <div class="ele-cell ele-cell-align-top">
                 <div class="ele-cell-content ele-elip">{{ item.title }}</div>
-                <el-tag
-                  size="mini"
-                  :type="['info','danger',''][item.state]">
+                <el-tag size="mini" :type="['info','danger',''][item.state]">
                   {{ ['未开始', '即将到期', '进行中'][item.state] }}
                 </el-tag>
               </div>
@@ -116,24 +69,12 @@
             <el-divider/>
           </div>
         </div>
-        <div
-          v-if="todo.length"
-          class="ele-cell ele-notice-actions">
-          <div
-            @click="clear(3)"
-            class="ele-cell-content">清空待办
-          </div>
-          <el-divider
-            direction="vertical"
-            class="line-color-light"/>
-          <div
-            @click="more(3)"
-            class="ele-cell-content">查看更多
-          </div>
+        <div v-if="todo.length" class="ele-cell ele-notice-actions">
+          <div class="ele-cell-content" @click="clear('todo')">清空待办</div>
+          <el-divider direction="vertical" class="line-color-light"/>
+          <div class="ele-cell-content" @click="more('todo')">查看更多</div>
         </div>
-        <ele-empty
-          v-if="!todo.length"
-          text="你已完成所有任务"/>
+        <ele-empty v-if="!todo.length" text="你已完成所有任务"/>
       </el-tab-pane>
     </el-tabs>
   </el-popover>
@@ -226,24 +167,15 @@ export default {
   computed: {
     // 通知标题
     noticeLabel() {
-      if (this.notice.length) {
-        return `通知(${this.notice.length})`;
-      }
-      return '通知';
+      return this.notice.length ? `通知(${this.notice.length})` : '通知';
     },
     // 私信标题
     messageLabel() {
-      if (this.message.length) {
-        return `私信(${this.message.length})`;
-      }
-      return '私信';
+      return this.message.length ? `私信(${this.message.length})` : '私信';
     },
     // 待办标题
     todoLabel() {
-      if (this.todo.length) {
-        return `待办(${this.todo.length})`;
-      }
-      return '待办';
+      return this.todo.length ? `待办(${this.todo.length})` : '待办';
     },
     // 所有消息数量
     allNum() {
@@ -253,21 +185,25 @@ export default {
   methods: {
     /* 清空消息 */
     clear(type) {
-      if (type === 1) {
+      if (type === 'notice') {
         this.notice = [];
-      } else if (type === 2) {
+      } else if (type === 'message') {
         this.message = [];
-      } else if (type === 3) {
+      } else if (type === 'todo') {
         this.todo = [];
       }
     },
     /* 查看更多 */
     more(type) {
-      console.log(type);
-      if (this.$route.path !== '/user/message') {
-        this.$router.push('/user/message');
+      this.visible = false;
+      if (this.$route.path !== '/user/message' || this.$route.query.type !== type) {
+        this.$router.push({
+          path: '/user/message',
+          query: {
+            type: type
+          }
+        });
       }
-      this.show = false;
     }
   }
 }
@@ -275,17 +211,16 @@ export default {
 
 <style lang="scss">
 .ele-notice-group {
-  vertical-align: top !important;
-  display: inline-block;
+  display: block;
 
   .el-badge {
-    line-height: normal;
+    line-height: 1;
+    display: block;
   }
 }
 
 /* 消息通知pop */
 .ele-notice-pop {
-  margin: 0 !important;
   padding: 0 !important;
 
   /* tab */

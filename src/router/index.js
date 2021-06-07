@@ -6,7 +6,7 @@ import VueRouter from 'vue-router';
 import store from '@/store';
 import setting from '@/config/setting';
 import EleLayout from '@/layout';
-import {EleEmptyLayout, EleIframeLayout} from 'ele-admin';
+import {menuToRoutes} from 'ele-admin';
 import NProgress from 'nprogress';
 
 Vue.use(VueRouter);
@@ -25,8 +25,7 @@ const routes = [
   },
   {
     path: '*',
-    component: () => import('@/views/exception/404'),
-    meta: {title: '404'}
+    component: () => import('@/views/exception/404')
   }
 ];
 
@@ -45,15 +44,14 @@ router.beforeEach((to, from, next) => {
     if (!store.state.user.menus) {
       // 获取动态路由
       store.dispatch('user/getMenus').then(({menus, home}) => {
-        if (menus) {
-          router.addRoute({
-            name: '/',
-            path: '/',
-            component: EleLayout,
-            redirect: setting.homePath || home,
-            children: menuToRoutes(menus)
-          });
-        }
+        // menuToRoutes方法是把菜单数据转换路由数据格式, 并会过滤掉重复的path, 详细说明到文档中查看
+        router.addRoute({
+          name: '/',
+          path: '/',
+          component: EleLayout,
+          redirect: setting.homePath || home,
+          children: menuToRoutes(menus, (component) => import('@/views' + component))
+        });
         next({...to, replace: true});
       }).catch(() => {
         next();
@@ -78,59 +76,8 @@ router.afterEach(() => {
 export default router;
 
 /**
- * 菜单生成路由
- * @param menus
- * @returns {[]}
- */
-function menuToRoutes(menus) {
-  if (!menus) {
-    return null;
-  }
-  let routes = [];
-  menus.forEach(item => {
-    const path = item.path;
-    if (path && !isUrl(path)) {
-      let meta = Object.assign({}, item.meta);
-      let component;
-      if (item.component) {
-        if (isUrl(item.component)) {
-          component = EleIframeLayout;
-          meta.iframe = item.component;
-          meta.hideFooter = true;
-        } else {
-          component = () => import('@/views' + item.component);
-        }
-      } else {
-        component = EleEmptyLayout;
-      }
-      routes.push({
-        meta: meta,
-        name: item.path,
-        path: item.path,
-        component: component,
-        redirect: item.redirect,
-        children: menuToRoutes(item.children)
-      });
-    }
-  });
-  return routes;
-}
-
-/**
- * 判断是否是网址
- * @param url
- */
-function isUrl(url) {
-  return url && (
-    url.startsWith('http://') ||
-    url.startsWith('https://') ||
-    url.startsWith('//')
-  );
-}
-
-/**
  * 更新浏览器标题
- * @param route
+ * @param route 路由
  */
 function updateTitle(route) {
   let names = [];

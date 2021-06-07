@@ -8,6 +8,7 @@
 </template>
 
 <script>
+const BASE_URL = process.env.BASE_URL;
 import tinymce from 'tinymce/tinymce';
 import 'tinymce/icons/default';
 import 'tinymce/themes/silver';
@@ -45,9 +46,9 @@ import Editor from '@tinymce/tinymce-vue';
 const defaultConfig = {
   height: 300,
   branding: false,
-  skin_url: '/tinymce/skins/ui/oxide',
-  content_css: '/tinymce/skins/content/default/content.min.css',
-  language_url: '/tinymce/langs/zh_CN.js',
+  skin_url: BASE_URL + 'tinymce/skins/ui/oxide',
+  content_css: BASE_URL + 'tinymce/skins/content/default/content.min.css',
+  language_url: BASE_URL + 'tinymce/langs/zh_CN.js',
   language: 'zh_CN',
   plugins: [
     'code',
@@ -156,8 +157,8 @@ export default {
     if (this.autoTheme) {
       const darkMode = this.$store.state.theme.darkMode;
       theme = {
-        skin_url: darkMode ? '/tinymce/skins/ui/oxide-dark' : '/tinymce/skins/ui/oxide',
-        content_css: darkMode ? '/tinymce/skins/content/dark/content.min.css' : '/tinymce/skins/content/default/content.min.css'
+        skin_url: BASE_URL + (darkMode ? 'tinymce/skins/ui/oxide-dark' : 'tinymce/skins/ui/oxide'),
+        content_css: BASE_URL + (darkMode ? 'tinymce/skins/content/dark/content.min.css' : 'tinymce/skins/content/default/content.min.css')
       }
     }
     let config = Object.assign({}, defaultConfig, this.init, theme);

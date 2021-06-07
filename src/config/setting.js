@@ -8,6 +8,8 @@ export default {
   hideFooters: ['/system/dictionary', '/system/organization'],
   // 不显示侧边栏的路由地址
   hideSidebars: [],
+  // 可重复打开页签的路由地址
+  repeatableTabs: ['/system/user/info'],
   // 需要缓存的组件名称
   keepAliveList: [],
   // 菜单数据接口
@@ -99,6 +101,8 @@ export default {
   tabStyle: 0,
   // 布局风格: 0默认, 1顶部菜单风格, 2混合菜单风格
   layoutStyle: 0,
+  // 侧边栏菜单风格: default默认, mix双排菜单
+  sideMenuStyle: 'default',
   // 是否固定侧栏
   fixedSidebar: true,
   // 是否固定顶栏

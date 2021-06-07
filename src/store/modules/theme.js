@@ -14,7 +14,7 @@ try {
 // 获取缓存的主题配置和缓存的主题css
 const cacheTheme = getCache(cache, [
   'color', 'sideStyle', 'headStyle',
-  'tabStyle', 'layoutStyle', 'bodyFull',
+  'tabStyle', 'layoutStyle', 'sideMenuStyle', 'bodyFull',
   'fixedHeader', 'fixedSidebar', 'fixedBody',
   'showTabs', 'logoAutoSize', 'colorfulIcon',
   'sideUniqueOpen', 'showFooter', 'weakMode', 'darkMode'
@@ -47,6 +47,8 @@ export default {
     tabStyle: cacheTheme.tabStyle,
     // 布局风格: 0默认, 1顶部菜单风格, 2混合菜单风格
     layoutStyle: cacheTheme.layoutStyle,
+    // 侧边栏菜单风格: default默认, mix双排菜单
+    sideMenuStyle: cacheTheme.sideMenuStyle,
     // 是否固定侧栏
     fixedSidebar: cacheTheme.fixedSidebar,
     // 是否固定顶栏
