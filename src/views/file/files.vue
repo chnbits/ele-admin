@@ -12,7 +12,7 @@
             <el-button size="small" class="ele-btn-icon" icon="el-icon-folder-add" @click="openEdit">新建文件夹</el-button>
             <template v-if="checked.length">
               <el-button size="small" icon="el-icon-view" class="ele-btn-icon" :disabled="checked.length>1" @click="view(checked[0])">预览</el-button>
-              <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon hidden-xs-only" @click="deleteFile(checked)">删除</el-button>
+              <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon" @click="deleteFile(checked)">删除</el-button>
             </template>
           </div>
           <div class="ele-table-tool-right">
@@ -89,7 +89,7 @@
     </el-card>
     <!-- 用于图片预览 -->
     <el-image ref="previewImage" v-if="currentImage" :src="currentImage" class="ele-file-image-preview" :preview-src-list="previewList"></el-image>
-<!--    添加文件夹-->
+    <!--添加文件夹-->
     <file-edit :filePath="path" :visible.sync="showEdit" @done="reload"/>
     <file-upload :filePath="path" :visible.sync="showUpload" @done="reload"/>
   </div>
@@ -219,6 +219,7 @@ export default {
         this.$nextTick(() => {
           if (this.$refs.previewImage) {
             this.$refs.previewImage.showViewer = true;
+            console.log(this.$refs.previewImage)
           }
         });
       } else {  // 文件

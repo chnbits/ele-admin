@@ -25,8 +25,7 @@
           </el-col>
           <el-col :md="6" :sm="12">
             <div class="ele-form-actions">
-              <el-button type="primary" icon="el-icon-search" class="ele-btn-icon" @click="reload">查询
-              </el-button>
+              <el-button type="primary" icon="el-icon-search" class="ele-btn-icon" @click="reload">查询</el-button>
               <el-button @click="reset">重置</el-button>
             </div>
           </el-col>
@@ -36,18 +35,19 @@
       <ele-pro-table ref="table" :where="where" :datasource="url" :columns="columns" :selection.sync="selection">
         <!-- 表头工具栏 -->
         <template slot="toolbar">
-          <el-button @click="openEdit(null)" type="primary" icon="el-icon-plus" class="ele-btn-icon" size="small">添加
-          </el-button>
-          <el-button @click="removeBatch" type="danger" icon="el-icon-delete" class="ele-btn-icon" size="small">删除
-          </el-button>
-          <el-button @click="showImport=true" v-role="'admin'" icon="el-icon-upload2" class="ele-btn-icon" size="small">导入
-          </el-button>
+          <el-button @click="openEdit(null)" type="primary" icon="el-icon-plus" class="ele-btn-icon" size="small">添加</el-button>
+          <el-button @click="removeBatch" type="danger" icon="el-icon-delete" class="ele-btn-icon" size="small">删除</el-button>
+          <el-button @click="showImport=true" v-role="'admin'" icon="el-icon-upload2" class="ele-btn-icon" size="small">导入</el-button>
+        </template>
+        <!-- 用户名列 -->
+        <template slot="nickname" slot-scope="{row}">
+          <router-link :to="'/system/user/info?id=' + row.userId">
+            {{ row.nickname }}
+          </router-link>
         </template>
         <!-- 角色列 -->
         <template slot="roles" slot-scope="{row}">
-          <el-tag v-for="item in row.roles" :key="item.roleId" type="primary" size="mini">
-            {{ item.roleName }}
-          </el-tag>
+          <el-tag v-for="item in row.roles" :key="item.roleId" size="mini" type="primary" :disable-transitions="true">{{ item.roleName }}</el-tag>
         </template>
         <!-- 状态列 -->
         <template slot="state" slot-scope="{row}">
@@ -55,11 +55,9 @@
         </template>
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
-          <el-link type="primary" :underline="false" icon="el-icon-edit" @click="openEdit(row)">修改
-          </el-link>
+          <el-link type="primary" :underline="false" icon="el-icon-edit" @click="openEdit(row)">修改</el-link>
           <el-popconfirm class="ele-action" title="确定要删除此用户吗？" @confirm="remove(row)">
-            <el-link type="danger" slot="reference" :underline="false" icon="el-icon-delete">删除
-            </el-link>
+            <el-link type="danger" slot="reference" :underline="false" icon="el-icon-delete">删除</el-link>
           </el-popconfirm>
         </template>
       </ele-pro-table>
@@ -109,7 +107,8 @@ export default {
           label: '用户名',
           sortable: 'custom',
           showOverflowTooltip: true,
-          minWidth: 110
+          minWidth: 110,
+          slot: 'nickname'
         },
         {
           prop: 'sexName',
@@ -121,13 +120,6 @@ export default {
         {
           prop: 'phone',
           label: '手机号',
-          sortable: 'custom',
-          showOverflowTooltip: true,
-          minWidth: 110
-        },
-        {
-          prop: 'email',
-          label: '邮箱',
           sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
@@ -182,14 +174,12 @@ export default {
   methods: {
     /* 刷新表格 */
     reload() {
-      this.$refs.table.reload({page: 1});
+      this.$refs.table.reload({page: 1, where: this.where});
     },
     /* 重置搜索 */
     reset() {
       this.where = {};
-      this.$nextTick(() => {
-        this.reload();
-      });
+      this.reload();
     },
     /* 显示编辑 */
     openEdit(row) {
@@ -208,7 +198,7 @@ export default {
       this.$http.post('/sys/user/' + row.userId).then(res => {
         loading.close();
         if (res.data.code === 0) {
-          this.$message({type: 'success', message: res.data.msg});
+          this.$message.success(res.data.msg);
           this.reload();
         } else {
           this.$message.error(res.data.msg);
@@ -220,12 +210,12 @@ export default {
     },
     /* 批量删除 */
     removeBatch() {
+      if (!this.selection.length) {
+        this.$message.error('请至少选择一条数据')
+        return;
+      }
       if (!this.$hasPermission('sys:user:delete')){
         return this.$message.warning('没有权限！');
-      }
-      if (!this.selection.length) {
-        this.$message.error('请至少选择一条数据!')
-        return;
       }
       this.$confirm('确定要删除选中的用户吗?', '提示', {
         type: 'warning'
@@ -254,7 +244,9 @@ export default {
         return this.$message.warning('没有权限！');
       }
       const loading = this.$loading({lock: true});
-      this.$http.put('/sys/user/state/' + row.userId, {'state':row.state}).then(res => {
+      let params = new FormData();
+      params.append('state', row.state);
+      this.$http.put('/sys/user/state/' + row.userId, params).then(res => {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});
