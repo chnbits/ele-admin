@@ -197,6 +197,7 @@ export default {
               thumbnail: d.thumbnail ? (baseURL + '/' + d.thumbnail) : d.thumbnail,
               length: d.isDirectory ? '-' : this.getFileSize(d.length),
               directory:d.directory,
+              newName:d.newName,
               updateTime: this.$util.toDateString(d.updateTime)
             });
           });
@@ -219,7 +220,6 @@ export default {
         this.$nextTick(() => {
           if (this.$refs.previewImage) {
             this.$refs.previewImage.showViewer = true;
-            console.log(this.$refs.previewImage)
           }
         });
       } else {  // 文件
