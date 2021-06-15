@@ -32,7 +32,7 @@ export default {
   },
   props:{
     visible:Boolean,
-    filePath:String
+    filePath:[String,Array]
   },
   methods: {
     submitUpload() {

@@ -11,7 +11,7 @@
             <el-button size="small" type="primary" class="ele-btn-icon" icon="el-icon-folder-add" @click="openUpload">批量上传</el-button>
             <el-button size="small" class="ele-btn-icon" icon="el-icon-folder-add" @click="openEdit">新建文件夹</el-button>
             <template v-if="checked.length">
-              <el-button size="small" icon="el-icon-view" class="ele-btn-icon" :disabled="checked.length>1" @click="view(checked[0])">预览</el-button>
+              <el-button size="small" icon="el-icon-download" class="ele-btn-icon" :disabled="checked.length>1" @click="view(checked[0])">下载</el-button>
               <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon" @click="deleteFile(checked)">删除</el-button>
             </template>
           </div>
@@ -38,10 +38,10 @@
                     <span>大小</span>
                   </span>
                 </el-dropdown-item>
-                <el-dropdown-item command="updateTime">
-                  <span :class="['ele-file-sort-item ele-text-primary', {'active': sort === 'updateTime'}]">
+                <el-dropdown-item command="createTime">
+                  <span :class="['ele-file-sort-item ele-text-primary', {'active': sort === 'createTime'}]">
                     <i :class="['ele-file-sort-item-icon', {'el-icon-top': order === 'asc'}, {'el-icon-bottom': order === 'desc'}]"></i>
-                    <span>修改日期</span>
+                    <span>添加日期</span>
                   </span>
                 </el-dropdown-item>
               </el-dropdown-menu>
@@ -78,9 +78,9 @@
             <el-dropdown class="ele-file-list-item-tool">
               <i class="el-icon-more ele-text-primary"></i>
               <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item>移动到</el-dropdown-item>
+                <el-dropdown-item><a @click="openMove">移动到</a></el-dropdown-item>
                 <el-dropdown-item>复制到</el-dropdown-item>
-                <el-dropdown-item>删除</el-dropdown-item>
+                <el-dropdown-item><a @click="deleteFile([item])">删除</a></el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
           </template>
@@ -92,6 +92,7 @@
     <!--添加文件夹-->
     <file-edit :filePath="path" :visible.sync="showEdit" @done="reload"/>
     <file-upload :filePath="path" :visible.sync="showUpload" @done="reload"/>
+    <file-dir :filePath="path" :visible.sync="showDir" @done="reload"/>
   </div>
 </template>
 
@@ -99,10 +100,11 @@
 import EleFileList from 'ele-admin/packages/ele-file-list';
 import FileEdit from './file-edit';
 import FileUpload from './file-upload';
+import FileDir from "./file-dir";
 
 export default {
   name: 'FileManage',
-  components: {EleFileList,FileEdit,FileUpload},
+  components: {FileDir,EleFileList,FileEdit,FileUpload},
   data() {
     return {
       // 加载状态
@@ -130,6 +132,8 @@ export default {
 
       showUpload:false,
 
+      showDir:false,
+
       icons:[],
 
       smIcons:[],
@@ -150,11 +154,7 @@ export default {
       if (!this.$hasPermission('file:files:upload')){
         return this.$message.warning('没有权限！');
       }
-      let dir = '';
-      this.directory.forEach(function (item){
-        dir += '/'+item;
-      })
-      this.path = dir.substring(1);
+      this.path = this.directory;
       this.showUpload = true;
     },
     /*创建文件夹*/
@@ -162,12 +162,18 @@ export default {
       if (!this.$hasPermission('file:files:folder')){
         return this.$message.warning('没有权限！');
       }
-      let dir = '';
-      this.directory.forEach(function (item){
-          dir += '/'+item;
-      })
-      this.path = dir.substring(1);
+      this.path = this.directory;
       this.showEdit = true;
+    },
+    /*移动复制文件*/
+    openMove(){
+      // let dir = '';
+      // this.directory.forEach(function (item){
+      //   dir += '/'+item;
+      // })
+      // this.path = dir.substring(1);
+      this.path = this.directory;
+      this.showDir = true;
     },
     /* 查询文件列表 */
     query() {
@@ -198,7 +204,7 @@ export default {
               length: d.isDirectory ? '-' : this.getFileSize(d.length),
               directory:d.directory,
               newName:d.newName,
-              updateTime: this.$util.toDateString(d.updateTime)
+             createTime: this.$util.toDateString(d.createTime)
             });
           });
           this.data = result;
@@ -234,6 +240,7 @@ export default {
     /* 返回上级 */
     back() {
       this.directory.splice(this.directory.length - 1, 1);
+      // console.log(this.directory)
       this.query();
     },
     //刷新

@@ -24,7 +24,7 @@ export default {
     // 弹窗是否打开
     visible: Boolean,
 
-    filePath: {type:String,default:'/'}
+    filePath: [String,Array]
   },
   data() {
     return {
