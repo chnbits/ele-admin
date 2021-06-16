@@ -97,7 +97,8 @@
 </template>
 
 <script>
-import EleFileList from 'ele-admin/packages/ele-file-list';
+// import EleFileList from 'ele-admin/packages/ele-file-list';
+import EleFileList from '../../components/EleFileList';
 import FileEdit from './file-edit';
 import FileUpload from './file-upload';
 import FileDir from "./file-dir";
