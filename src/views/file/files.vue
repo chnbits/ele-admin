@@ -12,6 +12,7 @@
             <el-button size="small" class="ele-btn-icon" icon="el-icon-folder-add" @click="openEdit">新建文件夹</el-button>
             <template v-if="checked.length">
               <el-button size="small" icon="el-icon-download" class="ele-btn-icon" :disabled="checked.length>1" @click="view(checked[0])">下载</el-button>
+              <el-button size="small" icon="el-icon-rank" class="ele-btn-icon"  @click="openMove(checked)">移动</el-button>
               <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon" @click="deleteFile(checked)">删除</el-button>
             </template>
           </div>
@@ -71,19 +72,7 @@
       </div>
       <!-- 文件列表 -->
       <div v-loading="loading" style="min-height: 400px;">
-        <ele-file-list :icons="icons" :smIcons="smIcons" :data="data" :grid="grid" :sort="sort" :order="order" :checked.sync="checked" @item-click="onItemClick" @sort-change="onSortChange">
-          <template slot="tool" slot-scope="{item}">
-            <i title="查看" class="el-icon-view ele-file-list-item-tool ele-text-primary" @click.stop="view(item)"></i>
-            <i title="分享" class="el-icon-share ele-file-list-item-tool ele-text-primary"></i>
-            <el-dropdown class="ele-file-list-item-tool">
-              <i class="el-icon-more ele-text-primary"></i>
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item><a @click="openMove">移动到</a></el-dropdown-item>
-                <el-dropdown-item>复制到</el-dropdown-item>
-                <el-dropdown-item><a @click="deleteFile([item])">删除</a></el-dropdown-item>
-              </el-dropdown-menu>
-            </el-dropdown>
-          </template>
+        <ele-file-list :data="data" :grid="grid" :sort="sort" :order="order" :checked.sync="checked" @item-click="onItemClick" @sort-change="onSortChange">
         </ele-file-list>
       </div>
     </el-card>
@@ -92,12 +81,11 @@
     <!--添加文件夹-->
     <file-edit :filePath="path" :visible.sync="showEdit" @done="reload"/>
     <file-upload :filePath="path" :visible.sync="showUpload" @done="reload"/>
-    <file-dir :filePath="path" :visible.sync="showDir" @done="reload"/>
+    <file-dir ref="fileDir" :visible.sync="showDir" @done="reload"/>
   </div>
 </template>
 
 <script>
-// import EleFileList from 'ele-admin/packages/ele-file-list';
 import EleFileList from '../../components/EleFileList';
 import FileEdit from './file-edit';
 import FileUpload from './file-upload';
@@ -135,9 +123,6 @@ export default {
 
       showDir:false,
 
-      icons:[],
-
-      smIcons:[],
     };
   },
   computed: {
@@ -167,14 +152,18 @@ export default {
       this.showEdit = true;
     },
     /*移动复制文件*/
-    openMove(){
-      // let dir = '';
-      // this.directory.forEach(function (item){
-      //   dir += '/'+item;
-      // })
-      // this.path = dir.substring(1);
-      this.path = this.directory;
-      this.showDir = true;
+    openMove(checked){
+      let state = '';
+      checked.forEach(item=>{
+        if (item.isDirectory===1){
+          state = false;
+          return  this.$message.warning('只能移动文件！')
+        }else{
+          state = true;
+        }
+      })
+      this.$refs.fileDir.getTree(checked);
+      this.showDir = state;
     },
     /* 查询文件列表 */
     query() {
@@ -182,10 +171,10 @@ export default {
       this.data = [];
       this.checked = [];
       this.loading = true;
-      this.$http.get('/file/icons').then(i=>{
-        this.icons = i.data.icons;
-        this.smIcons = i.data.smIcons;
-      })
+      // this.$http.get('/file/icons').then(i=>{
+      //   this.icons = i.data.icons;
+      //   this.smIcons = i.data.smIcons;
+      // })
       this.$http.get('/file/list', {
         params: {
           sort: this.sort,
@@ -204,8 +193,7 @@ export default {
               thumbnail: d.thumbnail ? (baseURL + '/' + d.thumbnail) : d.thumbnail,
               length: d.isDirectory ? '-' : this.getFileSize(d.length),
               directory:d.directory,
-              newName:d.newName,
-             createTime: this.$util.toDateString(d.createTime)
+              createTime: this.$util.toDateString(d.createTime)
             });
           });
           this.data = result;

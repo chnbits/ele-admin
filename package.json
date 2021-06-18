@@ -22,6 +22,7 @@
     "ele-admin": "^1.4.0",
     "element-ui": "~2.15.1",
     "nprogress": "~0.2.0",
+    "throttle-debounce": "^3.0.1",
     "tinymce": "~5.7.0",
     "vue": "~2.6.12",
     "vue-axios": "~2.1.5",

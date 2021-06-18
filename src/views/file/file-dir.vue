@@ -1,18 +1,8 @@
 <!-- 用户编辑弹窗 -->
 <template>
   <el-dialog width="400px" :visible="visible" :lock-scroll="false" :destroy-on-close="true" custom-class="ele-dialog-form" @close="closeDiag(false)" :title="'移动/复制文件'">
-    <el-input
-      placeholder="输入关键字进行过滤"
-      v-model="filterText">
-    </el-input>
-    <el-tree
-      class="filter-tree"
-      show-checkbox
-      :check-strictly = true
-      :data="node"
-      :props="defaultProps"
-      :filter-node-method="filterNode"
-      ref="tree">
+    <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
+    <el-tree class="filter-tree" show-checkbox :check-strictly = true :data="node" :props="defaultProps" :filter-node-method="filterNode" ref="tree">
     </el-tree>
     <div slot="footer">
       <el-button @click="updateVisible(false)">取消</el-button>
@@ -35,15 +25,13 @@ export default {
       this.$refs.tree.filter(val);
     }
   },
-  mounted() {
-    this.getTree();
-  },
   data() {
     return {
       filterText:'',
       // 表单数据
       node:[],
       checked:[],
+      files:[],
       defaultProps: {
         children: 'children',
         label: 'name'
@@ -54,10 +42,11 @@ export default {
   },
   methods: {
     /*获取树数据*/
-    getTree() {
+    getTree(items) {
       this.$http.get('/file/dir').then(res=>{
         if (res.data.code === 0){
           this.node = res.data.data
+          this.files = items
         }else{
           this.$message.error('没有获取到目录信息！')
         }
@@ -65,9 +54,33 @@ export default {
     },
     /* 保存编辑 */
     save() {
-      console.log(this.$refs.tree.getCheckedNodes())
-      console.log(this.filePath)
+      let checkNodes = this.$refs.tree.getCheckedNodes();
+      let files = this.files;
+      let urls = [];
+      let thumbnail = [];
+      let toFile = [];
+      files.forEach(function (file){
+        urls.push(file.url)
+        thumbnail.push(file.thumbnail)
+      })
+      checkNodes.forEach(function (item){
+        let File;
+        if (item.name === 'root'){
+          File = 'root';
+        }else{
+          File = item.directory === null?item.name:item.directory+'/'+item.name
+        }
+        toFile.push(File)
+      })
       // this.loading = true;
+      this.$http.post('/file/move',{'urls':urls,'toFile':toFile,'thumbs':thumbnail}).then(res=>{
+        if (res.data.code === 0){
+          this.$message.success(res.data.msg)
+          this.$emit('done');
+        }else{
+          this.$message.error(res.data.msg)
+        }
+      })
     },
     filterNode(value, data) {
       if (!value) return true;

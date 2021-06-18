@@ -74,9 +74,7 @@
       </div>
       <!-- 列表item -->
       <div
-        v-for="(item, i) in data"
-        :key="i"
-        :class="['ele-file-list-table-item', {'checked': checked.indexOf(item)>=0}]">
+        v-for="(item, i) in data" :key="i" :class="['ele-file-list-table-item', {'checked': checked.indexOf(item)>=0}]">
         <!-- 背景和边框 -->
         <div class="ele-file-list-table-item-bg ele-bg-primary"></div>
         <div class="ele-file-list-table-item-border ele-border-primary"></div>
