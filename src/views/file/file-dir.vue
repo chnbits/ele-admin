@@ -2,8 +2,7 @@
 <template>
   <el-dialog width="400px" :visible="visible" :lock-scroll="false" :destroy-on-close="true" custom-class="ele-dialog-form" @close="closeDiag(false)" :title="'移动/复制文件'">
     <el-input placeholder="输入关键字进行过滤" v-model="filterText"></el-input>
-    <el-tree class="filter-tree" show-checkbox :check-strictly = true :data="node" :props="defaultProps" :filter-node-method="filterNode" ref="tree">
-    </el-tree>
+    <el-tree class="filter-tree" show-checkbox :check-strictly = true :data="node" :props="defaultProps" :filter-node-method="filterNode" ref="tree"></el-tree>
     <div slot="footer">
       <el-button @click="updateVisible(false)">取消</el-button>
       <el-button type="primary" :loading="loading" @click="save(checked)">保存</el-button>
@@ -72,11 +71,13 @@ export default {
         }
         toFile.push(File)
       })
-      // this.loading = true;
+      this.loading = true;
       this.$http.post('/file/move',{'urls':urls,'toFile':toFile,'thumbs':thumbnail}).then(res=>{
         if (res.data.code === 0){
           this.$message.success(res.data.msg)
+          this.updateVisible(false);
           this.$emit('done');
+          this.loading = false;
         }else{
           this.$message.error(res.data.msg)
         }
@@ -84,7 +85,7 @@ export default {
     },
     filterNode(value, data) {
       if (!value) return true;
-      return data.label.indexOf(value) !== -1;
+      return data.name.indexOf(value) !== -1;
     },
     /* 更新visible */
     updateVisible(value) {
@@ -99,4 +100,7 @@ export default {
 </script>
 
 <style scoped>
+  .el-tree{
+    margin: 20px 0;
+  }
 </style>

@@ -171,10 +171,6 @@ export default {
       this.data = [];
       this.checked = [];
       this.loading = true;
-      // this.$http.get('/file/icons').then(i=>{
-      //   this.icons = i.data.icons;
-      //   this.smIcons = i.data.smIcons;
-      // })
       this.$http.get('/file/list', {
         params: {
           sort: this.sort,
