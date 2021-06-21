@@ -96,14 +96,16 @@ export default {
       this.$refs['form'].validate((valid) => {
         if (valid) {
           this.loading = true;
-          let formData = new FormData();
-          formData.append('oldPsw', this.form.old);
-          formData.append('newPsw', this.form.password);
-          this.$http.put('/main/password', formData).then(res => {
+          this.$http.put('/main/password', {'oldPsw':this.form.old,'newPsw':this.form.password}).then(res => {
             this.loading = false;
             if (res.data.code === 0) {
               this.$message({type: 'success', message: res.data.msg});
               this.cancel();
+              this.$alert('密码已更改，请重新登录！',{type: 'warning'}).then(()=>{
+                this.$store.dispatch('user/removeToken').then(() => {
+                  location.replace('/login');  // 这样跳转避免再次登录重复注册动态路由
+                })
+              })
             } else {
               this.$message.error(res.data.msg);
             }

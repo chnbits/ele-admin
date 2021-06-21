@@ -52,7 +52,7 @@ export default {
       // 表单数据
       form: {
         username: 'admin',
-        password: 'admin',
+        password: '123456',
         code: '',
         remember: true
       },
