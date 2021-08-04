@@ -251,16 +251,18 @@ export default {
     /* 保存编辑 */
     save() {
       formData.append('data',JSON.stringify(this.form))
+      this.editLoading = true;
       this.$http.post('/article/create',formData).then(res=>{
         if (res.data.code === 0){
           this.$message.success(res.data.msg)
-          this.updateVisible(false)
-          this.$emit('done')
+          this.editLoading = false;
+          this.updateVisible(false);
+          this.$emit('done');
         }else{
-          this.$message.error(res.data.msg)
+          this.$message.error(res.data.msg);
         }
       }).catch(e=>{
-        this.$message.error(e.message)
+        this.$message.error(e.message);
       })
     },
     test(){
