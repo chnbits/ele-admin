@@ -4,19 +4,9 @@
       <!-- 搜索表单 -->
       <el-form :model="where" label-width="77px" class="ele-form-search" @keyup.enter.native="reload" @submit.native.prevent>
         <el-row :gutter="15">
-          <el-col :md="6" :sm="12">
-            <el-form-item label="角色名称:">
-              <el-input clearable v-model="where.roleName" placeholder="请输入"/>
-            </el-form-item>
-          </el-col>
-          <el-col :md="6" :sm="12">
-            <el-form-item label="角色标识:">
-              <el-input clearable v-model="where.roleCode" placeholder="请输入"/>
-            </el-form-item>
-          </el-col>
-          <el-col :md="6" :sm="12">
-            <el-form-item label="备注:">
-              <el-input clearable v-model="where.comments" placeholder="请输入"/>
+          <el-col :md="10" :sm="12">
+            <el-form-item label="标签名称:">
+              <el-input clearable v-model="where.name" placeholder="请输入"/>
             </el-form-item>
           </el-col>
           <el-col :md="6" :sm="12">
@@ -37,13 +27,17 @@
           <el-button size="small" type="danger" icon="el-icon-delete" class="ele-btn-icon" @click="removeBatch">删除
           </el-button>
         </template>
+        <!--状态列-->
+        <template slot="state" slot-scope="{row}">
+          <el-tag :key="row.state !==1?'禁用':'正常'"
+                  :type="row.state !==1?'warning':'success'"
+                  effect="plain">{{row.state !== 1?'禁用':'正常'}}</el-tag>
+        </template>
+
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
-          <el-link type="primary" :underline="false" icon="el-icon-edit" @click="openEdit(row)">修改
-          </el-link>
-          <el-link type="primary" :underline="false" icon="el-icon-finished" @click="openAuth(row)">分配权限
-          </el-link>
-          <el-popconfirm class="ele-action" title="确定要删除此角色吗？" @confirm="remove(row)">
+          <el-link type="primary" :underline="false" icon="el-icon-edit" @click="openEdit(row)">修改</el-link>
+          <el-popconfirm class="ele-action" title="确定要删除此标签吗？" @confirm="remove(row)">
             <el-link type="danger" slot="reference" :underline="false" icon="el-icon-delete">删除
             </el-link>
           </el-popconfirm>
@@ -51,23 +45,20 @@
       </ele-pro-table>
     </el-card>
     <!-- 编辑弹窗 -->
-    <role-edit :data="current" :visible.sync="showEdit" @done="reload"/>
-    <!-- 权限分配弹窗 -->
-    <role-auth :data="current" :visible.sync="showAuth"/>
+    <tags-edit :data="current" :visible.sync="showEdit" @done="reload"/>
   </div>
 </template>
 
 <script>
-import RoleEdit from './role-edit';
-import RoleAuth from './role-auth';
+import TagsEdit from './tags-edit';
 
 export default {
-  name: 'SystemRole',
-  components: {RoleEdit, RoleAuth},
+  name: 'tags',
+  components: {TagsEdit},
   data() {
     return {
       // 表格数据接口
-      url: '/sys/role/page',
+      url: '/article/tags',
       // 表格列配置
       columns: [
         {
@@ -78,35 +69,52 @@ export default {
         },
         {
           columnKey: 'index',
+          label:'ID',
           type: 'index',
           width: 45,
           align: 'center',
           showOverflowTooltip: true
         },
         {
-          prop: 'roleName',
-          label: '角色名称',
+          prop: 'name',
+          label: '标签名称',
+          align:'center',
           sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
-          prop: 'roleCode',
-          label: '角色标识',
+          prop: 'desc',
+          label: '标签备注',
+          align:'center',
           sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
-          prop: 'comments',
-          label: '备注',
+          prop: 'state',
+          label: '标签状态',
+          align:'center',
           sortable: 'custom',
+          slot: 'state',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
           prop: 'createTime',
           label: '创建时间',
+          align:'center',
+          sortable: 'custom',
+          showOverflowTooltip: true,
+          minWidth: 110,
+          formatter: (row, column, cellValue) => {
+            return this.$util.toDateString(cellValue);
+          }
+        },
+        {
+          prop: 'updateTime',
+          label: '更新时间',
+          align:'center',
           sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110,
@@ -132,7 +140,6 @@ export default {
       // 是否显示编辑弹窗
       showEdit: false,
       // 是否显示导入弹窗
-      showAuth: false
     };
   },
   methods: {
@@ -149,27 +156,20 @@ export default {
     },
     /* 显示编辑 */
     openEdit(row) {
-      if (!this.$hasPermission(row!==null?'sys:role:edit':'sys:role:add')){
+      if (!this.$hasPermission(row!==null?'article:tags:edit':'article:tags:add')){
         return this.$message.warning('没有权限！')
       }
       this.current = row;
       this.showEdit = true;
     },
-    /* 显示分配权限 */
-    openAuth(row) {
-      if (!this.$hasPermission('sys:role:right')){
-        return this.$message.warning('没有权限！')
-      }
-      this.current = row;
-      this.showAuth = true;
-    },
+
     /* 删除 */
     remove(row) {
-      if (!this.$hasPermission('sys:role:remove')){
+      if (!this.$hasPermission('article:tags:remove')){
         return this.$message.warning('没有权限！');
       }
       const loading = this.$loading({lock: true});
-      this.$http.put('/sys/role/' + row.roleId).then(res => {
+      this.$http.put('/article/tags/' + row.id,{name:row.name}).then(res => {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});
@@ -187,15 +187,15 @@ export default {
       if (!this.selection.length) {
         return this.$message.error('请至少选择一条数据');
       }
-      if (!this.$hasPermission('sys:role:remove')){
+      if (!this.$hasPermission('article:tags:remove')){
         return this.$message.warning('没有权限！');
       }
       this.$confirm('确定要删除选中的角色吗?', '提示', {
         type: 'warning'
       }).then(() => {
         const loading = this.$loading({lock: true});
-        this.$http.put('/sys/role/batch', {
-          data: this.selection.map(d => d.roleId)
+        this.$http.put('/article/tags/batch', {
+          data: this.selection.map(d => d.id)
         }).then(res => {
           loading.close();
           if (res.data.code === 0) {

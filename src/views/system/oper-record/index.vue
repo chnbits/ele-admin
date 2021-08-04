@@ -161,15 +161,6 @@ export default {
           showOverflowTooltip: true,
           slot: 'state'
         },
-        // {
-        //   prop: 'spendTime',
-        //   label: '耗时',
-        //   sortable: 'custom',
-        //   showOverflowTooltip: true,
-        //   formatter: (row, column, cellValue) => {
-        //     return cellValue / 1000 + 's';
-        //   }
-        // },
         {
           prop: 'createTime',
           label: '操作时间',
@@ -263,7 +254,7 @@ export default {
     exportData() {
       let array = [['账号', '用户名', '操作模块', '操作功能', '请求地址', '请求方式', '状态', '耗时', '操作时间']];
       const loading = this.$loading({lock: true});
-      this.$http.get('/sys/operRecord/page?page=1&limit=2000').then(res => {
+      this.$http.get('/sys/operRecord/page',{params:{page:1,limit:2000}}).then(res => {
         loading.close();
         if (res.data.code === 0) {
           res.data.data.forEach(d => {

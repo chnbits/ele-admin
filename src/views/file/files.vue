@@ -54,8 +54,7 @@
         <!-- 文件目录面包屑 -->
         <div class="ele-file-breadcrumb-group ele-cell">
           <div class="ele-cell-content ele-cell">
-            <div v-if="directory.length" class="ele-file-breadcrumb-back ele-text-primary" @click="back">返回上一级
-            </div>
+            <div v-if="directory.length" class="ele-file-breadcrumb-back ele-text-primary" @click="back">返回上一级</div>
             <div class="ele-file-breadcrumb-list ele-cell-content ele-cell">
               <div :class="['ele-file-breadcrumb-item ele-cell', {'ele-text-primary': directory.length}]" @click="listAll">
                 <div class="ele-file-breadcrumb-item-title">全部文件</div>
@@ -316,7 +315,7 @@ export default {
     },
     /*删除*/
     deleteFile(items){
-      if (!this.$hasPermission('file:files:delete')){
+      if (!this.$hasPermission('file:files:remove')){
         return this.$message.warning('没有权限！');
       }
       this.$confirm('删除后文件夹包含内部文件将无法恢复！确认要删除选中项？').then(()=>{

@@ -1,9 +1,13 @@
-/** 如果需要自己定义一些全局样式写在这里 */
-
+/** 全局样式 */
+// 如果需要覆盖框架样式变量写这里, 例如不需要切换主题时修改默认的主题色
+//$--color-primary: #1890ff;
 $--ele-font-path: "~ele-admin/packages/style/fonts";
-
-@import "./var.scss";
-@import "~ele-admin/packages/style/index.scss";
+// 如果不需要切换主题使用这个
+//@import "~ele-admin/packages/style/themes/default.scss";
+// 如果不需要切换主题固定为夜间主题使用这个
+//@import "~ele-admin/packages/style/themes/dark.scss";
+// 需要在线切换主题使用这个
+@import "~ele-admin/packages/style/themes/dynamic.scss";
 
 /* 异常页面 */
 .ele-exception {

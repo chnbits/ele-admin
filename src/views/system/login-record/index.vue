@@ -225,7 +225,7 @@ export default {
     exportData() {
       let array = [['账号', '用户名', 'IP地址', '设备型号', '操作系统', '浏览器', '操作类型', '备注', '登录时间']];
       const loading = this.$loading({lock: true});
-      this.$http.get('/sys/loginRecord/page?page=1&limit=2000').then(res => {
+      this.$http.get('/sys/loginRecord/page',{params:{page:1,limit:2000}}).then(res => {
         loading.close();
         if (res.data.code === 0) {
           res.data.data.forEach(d => {

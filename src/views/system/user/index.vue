@@ -191,7 +191,7 @@ export default {
     },
     /* 删除 */
     remove(row) {
-      if (!this.$hasPermission('sys:user:delete')){
+      if (!this.$hasPermission('sys:user:remove')){
         return this.$message.warning('没有权限！');
       }
       const loading = this.$loading({lock: true});
@@ -214,7 +214,7 @@ export default {
         this.$message.error('请至少选择一条数据')
         return;
       }
-      if (!this.$hasPermission('sys:user:delete')){
+      if (!this.$hasPermission('sys:user:remove')){
         return this.$message.warning('没有权限！');
       }
       this.$confirm('确定要删除选中的用户吗?', '提示', {
@@ -244,9 +244,7 @@ export default {
         return this.$message.warning('没有权限！');
       }
       const loading = this.$loading({lock: true});
-      let params = new FormData();
-      params.append('state', row.state);
-      this.$http.put('/sys/user/state/' + row.userId, params).then(res => {
+      this.$http.put('/sys/user/state/' + row.userId, {'state':row.state}).then(res => {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});

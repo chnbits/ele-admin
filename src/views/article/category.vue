@@ -4,14 +4,9 @@
       <!-- 搜索表单 -->
       <el-form :model="where" label-width="77px" class="ele-form-search" @keyup.enter.native="reload" @submit.native.prevent>
         <el-row :gutter="15">
-          <el-col :md="6" :sm="12">
-            <el-form-item label="菜单名称:">
-              <el-input clearable v-model="where.title" placeholder="请输入"/>
-            </el-form-item>
-          </el-col>
-          <el-col :md="6" :sm="12">
-            <el-form-item label="菜单地址:">
-              <el-input clearable v-model="where.path" placeholder="请输入"/>
+          <el-col :md="8" :sm="12">
+            <el-form-item label="分类名称:">
+              <el-input clearable v-model="where.name" placeholder="请输入"/>
             </el-form-item>
           </el-col>
           <el-col :md="12" :sm="12">
@@ -23,7 +18,7 @@
         </el-row>
       </el-form>
       <!-- 数据表格 -->
-      <ele-pro-table ref="table" :where="where" row-key="menuId" :datasource="url" :columns="columns" default-expand-all :need-page="false" :parse-data="parseData">
+      <ele-pro-table ref="table" :where="where" row-key="id" :datasource="url" :columns="columns" default-expand-all :need-page="false" :parse-data="parseData">
         <!-- 表头工具栏 -->
         <template slot="toolbar">
           <el-button size="small" type="primary" icon="el-icon-plus" class="ele-btn-icon" @click="openEdit(null)">添加
@@ -33,25 +28,20 @@
           <el-button @click="foldAll" class="ele-btn-icon" size="small">折叠全部
           </el-button>
         </template>
+        <!--图片列-->
+        <template slot="image" slot-scope="{row}">
+          <el-image :src="row.image" style="width:60px;height: 40px" />
+        </template>
         <!-- 标题列 -->
-        <template slot="title" slot-scope="{row}">
-          <i :class="row.icon"></i> {{ row.title }}
+        <template slot="name" slot-scope="{row}">
+           {{row.name}}
         </template>
-        <!-- 类型列 -->
-        <template slot="menuType" slot-scope="{row}">
-          <el-tag v-if="isUrl(row.path)" type="warning" size="mini">外链
-          </el-tag>
-          <el-tag v-else-if="isUrl(row.component)" type="success" size="mini">内链
-          </el-tag>
-          <el-tag v-else :type="['primary', 'info'][row.menuType]" size="mini">{{ ['菜单', '按钮'][row.menuType] }}
-          </el-tag>
-        </template>
+
         <!-- 操作列 -->
         <template slot="action" slot-scope="{row}">
-          <el-link type="primary" :underline="false" icon="el-icon-plus" @click="openEdit(null, row.menuId)">添加
+          <el-link type="primary" :underline="false" icon="el-icon-plus" @click="openEdit(null, row.id)">添加
           </el-link>
-          <el-link type="primary" :underline="false" icon="el-icon-edit" @click="openEdit(row)">修改
-          </el-link>
+          <el-link type="primary" :underline="false" icon="el-icon-edit" @click="openEdit(row)">修改</el-link>
           <el-popconfirm class="ele-action" title="确定要删除吗？" @confirm="remove(row)">
             <el-link type="danger" slot="reference" :underline="false" icon="el-icon-delete">删除
             </el-link>
@@ -60,20 +50,20 @@
       </ele-pro-table>
     </el-card>
     <!-- 编辑弹窗 -->
-    <menu-edit :data="current" :menu-list="menuList" :visible.sync="showEdit" @done="reload"/>
+    <cate-edit :data="current" :cate-list="cateList" :visible.sync="showEdit" @done="reload"/>
   </div>
 </template>
 
 <script>
-import MenuEdit from './menu-edit';
+import CateEdit from './cate-edit';
 
 export default {
-  name: 'SystemMenu',
-  components: {MenuEdit},
+  name: 'Category',
+  components: {CateEdit},
   data() {
     return {
       // 表格数据接口
-      url: '/sys/menu',
+      url: '/article/category',
       // 表格列配置
       columns: [
         {
@@ -84,59 +74,39 @@ export default {
           showOverflowTooltip: true
         },
         {
-          prop: 'title',
-          label: '菜单名称',
+          prop: 'name',
+          label: '分类名称',
           showOverflowTooltip: true,
-          minWidth: 110,
-          slot: 'title'
+          slot: 'name'
         },
         {
-          prop: 'path',
-          label: '路由地址',
+          prop: 'image',
+          label: '分类图标',
+          align: 'center',
+          slot:'image',
           showOverflowTooltip: true,
-          minWidth: 110
         },
         {
-          prop: 'component',
-          label: '组件路径',
-          showOverflowTooltip: true,
-          minWidth: 110
-        },
-        {
-          prop: 'authority',
-          label: '权限标识',
-          showOverflowTooltip: true,
-          minWidth: 110
-        },
-        {
-          prop: 'sortNumber',
-          label: '排序',
+          prop: 'desc',
+          label: '分类描述',
           align: 'center',
           showOverflowTooltip: true,
-          width: 60
-        },
-        {
-          prop: 'hide',
-          label: '可见',
-          align: 'center',
-          showOverflowTooltip: true,
-          width: 60,
-          formatter: (row, column, cellValue) => {
-            return ['是', '否'][cellValue];
-          }
-        },
-        {
-          prop: 'menuType',
-          label: '类型',
-          align: 'center',
-          showOverflowTooltip: true,
-          width: 60,
-          slot: 'menuType'
         },
         {
           prop: 'createTime',
           label: '创建时间',
           showOverflowTooltip: true,
+          align: 'center',
+          minWidth: 110,
+          formatter: (row, column, cellValue) => {
+            return this.$util.toDateString(cellValue);
+          }
+        },
+        {
+          prop: 'updateTime',
+          label: '修改时间',
+          showOverflowTooltip: true,
+          align: 'center',
           minWidth: 110,
           formatter: (row, column, cellValue) => {
             return this.$util.toDateString(cellValue);
@@ -159,15 +129,15 @@ export default {
       current: null,
       // 是否显示编辑弹窗
       showEdit: false,
-      // 全部菜单数据
-      menuList: []
+      // 全部数据
+      cateList: []
     };
   },
   methods: {
     /* 解析接口返回数据 */
     parseData(res) {
-      res.data = this.$util.toTreeData(res.data, 'menuId', 'parentId');
-      this.menuList = res.data;
+      res.data = this.$util.toTreeData(res.data, 'id', 'pid');
+      this.cateList = res.data;
       return res;
     },
     /* 刷新表格 */
@@ -182,20 +152,18 @@ export default {
       });
     },
     /* 显示编辑 */
-    openEdit(row, parentId) {
-      if (!this.$hasPermission(row!==null?'sys:menu:edit':'sys:menu:add')){
+    openEdit(row, pid) {
+      if (!this.$hasPermission(row!==null?'article:category:edit':'article:category:add')){
         return this.$message.warning('没有权限！')
       }
       this.current = Object.assign({
-        menuType: 0,
-        hide: 0,
-        parentId: parentId
+        pid: pid
       }, row);
       this.showEdit = true;
     },
     /* 删除 */
     remove(row) {
-      if (!this.$hasPermission('sys:menu:remove')){
+      if (!this.$hasPermission('article:category:remove')){
         return this.$message.warning('没有权限！')
       }
       if (row.children && row.children.length > 0) {
@@ -203,7 +171,7 @@ export default {
         return;
       }
       const loading = this.$loading({lock: true});
-      this.$http.put('/sys/menu/' + row.menuId).then(res => {
+      this.$http.put('/article/category/' + row.id,{'name':row.name},{headers:{'Content-Type':'application/json;token'}}).then(res => {
         loading.close();
         if (res.data.code === 0) {
           this.$message({type: 'success', message: res.data.msg});

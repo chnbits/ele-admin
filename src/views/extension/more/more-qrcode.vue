@@ -2,14 +2,9 @@
   <el-card
     shadow="never"
     header="二维码">
-    <vue-qr
-      :text="text"
-      :size="100"
-      :margin="0"/>
+    <vue-qr :text="text" :size="100" :margin="0"/>
     <div style="display: inline-block;margin: 15px 10px 0 15px;width: 160px;vertical-align: bottom;">
-      <el-input
-        v-model="text"
-        size="mini"/>
+      <el-input v-model="text" size="mini"/>
     </div>
   </el-card>
 </template>

@@ -3,36 +3,36 @@
   <ele-pro-layout
     ref="layout"
     :i18n="i18n"
-    :tabs="user.tabs"
     :menus="user.menus"
     :home-title="homeTitle"
     :project-name="projectName"
-    :hide-footers="hideFooters"
-    :hide-sidebars="hideSidebars"
-    :repeatable-tabs="repeatableTabs"
-    :keep-alive-list="keepAliveList"
     :show-content="showContent"
-    :need-setting="needSetting"
     :show-setting.sync="showSetting"
+    :need-setting="setting.needSetting"
+    :hide-footers="setting.hideFooters"
+    :hide-sidebars="setting.hideSidebars"
+    :repeatable-tabs="setting.repeatableTabs"
+    :tabs="theme.tabs"
+    :color="theme.color"
     :collapse="theme.collapse"
     :head-style="theme.headStyle"
     :side-style="theme.sideStyle"
     :layout-style="theme.layoutStyle"
     :side-menu-style="theme.sideMenuStyle"
-    :body-full="theme.bodyFull"
     :fixed-body="theme.fixedBody"
     :fixed-header="theme.fixedHeader"
     :fixed-sidebar="theme.fixedSidebar"
+    :body-full="theme.bodyFull"
+    :show-footer="theme.showFooter"
+    :colorful-icon="theme.colorfulIcon"
     :logo-auto-size="theme.logoAutoSize"
     :side-unique-open="theme.sideUniqueOpen"
-    :colorful-icon="theme.colorfulIcon"
-    :show-footer="theme.showFooter"
     :show-tabs="theme.showTabs"
     :tab-style="theme.tabStyle"
-    :weak-mode="theme.weakMode"
     :dark-mode="theme.darkMode"
-    :color="theme.color"
+    :weak-mode="theme.weakMode"
     @logo-click="onLogoClick"
+    @reload-page="reloadPage"
     @update-screen="updateScreen"
     @update-collapse="updateCollapse"
     @tab-add="tabAdd"
@@ -41,8 +41,11 @@
     @tab-remove-left="tabRemoveLeft"
     @tab-remove-right="tabRemoveRight"
     @tab-remove-other="tabRemoveOther"
+    @change-style="changeStyle"
     @change-color="changeColor"
-    @change-style="changeStyle">
+    @change-dark-mode="changeDarkMode"
+    @change-weak-mode="changeWeakMode"
+    @set-home-components="setHomeComponents">
     <!-- logo图标 -->
     <template slot="logo">
       <img src="@/assets/logo.svg" alt="logo"/>
@@ -50,12 +53,13 @@
     <!-- 顶栏右侧区域 -->
     <template slot="right">
       <ele-header-right
-        :show-setting="needSetting"
-        @item-click="onItemClick"
-        @change-language="changeLanguage"/>
+        ref="header"
+        :show-setting="setting.needSetting"
+        @change-language="changeLanguage"
+        @item-click="onItemClick"/>
     </template>
     <!-- 全局页脚 -->
-    <template #footer>
+    <template slot="footer">
       <ele-footer/>
     </template>
     <!-- 修改密码弹窗 -->
@@ -65,10 +69,19 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import setting from '@/config/setting';
 import EleHeaderRight from './header-right';
 import ElePassword from './password';
 import EleFooter from './footer';
+import setting from '@/config/setting';
+import {
+  reloadPageTab,
+  addPageTab,
+  removePageTab,
+  removeAllPageTab,
+  removeLeftPageTab,
+  removeRightPageTab,
+  removeOtherPageTab
+} from '@/utils/page-tab-util';
 
 export default {
   name: 'EleLayout',
@@ -78,46 +91,27 @@ export default {
     EleFooter
   },
   computed: {
-    // 主页标题
+    // 主页标题, 移除国际化上面template中使用:home-title="setting.homeTitle"
     homeTitle() {
       return this.$t('layout.home');
-      //return setting.homeTitle;  // 移除国际化后使用这一行
-    },
-    // 不显示全局页脚的路由地址
-    hideFooters() {
-      return setting.hideFooters;
-    },
-    // 不显示侧边栏的路由地址
-    hideSidebars() {
-      return setting.hideSidebars;
-    },
-    // 可重复打开页签的路由地址
-    repeatableTabs() {
-      return setting.repeatableTabs;
-    },
-    // 需要缓存的组件
-    keepAliveList() {
-      return setting.keepAliveList;
-    },
-    // 是否需要主题设置抽屉
-    needSetting() {
-      return setting.showSetting;
     },
     ...mapGetters(['theme', 'user'])
   },
   data() {
     return {
-      // 项目名
-      projectName: process.env.VUE_APP_NAME,
+      // 全局配置
+      setting: setting,
       // 是否显示修改密码弹窗
       showPassword: false,
       // 是否显示主题设置抽屉
       showSetting: false,
-      // 是否显示主体部分, 如果首页用到了权限控制指令, 把这个改成false, 避免权限控制指令可能不生效
-      showContent: true
+      // 是否显示主体部分
+      showContent: true,
+      // 项目名
+      projectName: process.env.VUE_APP_NAME
     };
   },
-  mounted() {
+  created() {
     // 获取用户信息
     this.getUserInfo();
   },
@@ -152,6 +146,10 @@ export default {
         this.showSetting = true;
       }
     },
+    /* 刷新页签 */
+    reloadPage() {
+      reloadPageTab();
+    },
     /* logo点击事件 */
     onLogoClick(isHome) {
       if (!isHome) {
@@ -165,6 +163,8 @@ export default {
     /* 更新屏幕尺寸 */
     updateScreen() {
       this.$store.dispatch('theme/updateScreen');
+      const checkFullscreen = this.$refs.header.checkFullscreen;
+      checkFullscreen && checkFullscreen();
     },
     /* 切换主题风格 */
     changeStyle(value) {
@@ -181,37 +181,49 @@ export default {
         this.$message.error('主题加载失败');
       });
     },
+    changeDarkMode(value) {
+      this.$store.dispatch('theme/setDarkMode', value);
+    },
+    changeWeakMode(value) {
+      this.$store.dispatch('theme/setWeakMode', value);
+    },
+    setHomeComponents(components) {
+      this.$store.dispatch('theme/setHomeComponents', components);
+    },
     /* 添加tab */
     tabAdd(value) {
-      this.$store.dispatch('user/tabAdd', value);
+      addPageTab(value);
     },
     /* 移除tab */
     tabRemove(obj) {
-      this.$store.dispatch('user/tabRemove', obj.name).then(({lastPath}) => {
+      removePageTab(obj.name).then(({lastPath}) => {
         if (obj.active === obj.name) {
           this.$router.push(lastPath || '/');
         }
       });
     },
     /* 移除全部tab */
-    tabRemoveAll() {
-      this.$store.dispatch('user/tabRemoveAll');
+    tabRemoveAll(active) {
+      removeAllPageTab();
+      if (active !== '/') {
+        this.$router.push('/');
+      }
     },
     /* 移除左边tab */
     tabRemoveLeft(value) {
-      this.$store.dispatch('user/tabRemoveLeft', value);
+      removeLeftPageTab(value);
     },
     /* 移除右边tab */
     tabRemoveRight(value) {
-      this.$store.dispatch('user/tabRemoveRight', value);
+      removeRightPageTab(value);
     },
     /* 移除其它tab */
     tabRemoveOther(value) {
-      this.$store.dispatch('user/tabRemoveOther', value);
+      removeOtherPageTab(value);
     },
     /* 菜单路由国际化对应的名称 */
     i18n(path, key/*, menu*/) {
-      // 参数menu即原始菜单数据, 如果需要菜单标题多语言数据从接口返回可用此参数获取对应的多语言标题
+      // 参数三menu即原始菜单数据, 如果需要菜单标题多语言数据从接口返回可用此参数获取对应的多语言标题
       // 例如下面这样写, 接口的菜单数据为{path: '/system/user', titles: {zh: '用户管理', en: 'User'}}
       // return menu ? menu.titles[this.$i18n.locale] : null;
       const k = 'route.' + key + '._name', title = this.$t(k);

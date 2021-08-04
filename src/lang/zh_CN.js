@@ -72,6 +72,12 @@ export default {
       _name:'文件管理',
       files:{_name:'文件列表'}
     },
+    article:{
+      _name:'内容管理',
+      category:{_name:'分类管理'},
+      tags:{_name:'标签管理'},
+      content:{_name:'文章管理'},
+    },
     'https://err5.com': {_name: '官方站点'},
     'http://wwwBaiduCom':{_name:'跳转页面'}
   },

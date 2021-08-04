@@ -214,7 +214,7 @@ export default {
           {field: 'city', width: 120, title: '市'},
           {
             width: 200, title: '区', templet: (d) => {
-              return `<span style="color:red;">${d.zone}</span>`;
+              return `<span style="color:#ff0000;">${d.zone}</span>`;
             }
           }
         ]
