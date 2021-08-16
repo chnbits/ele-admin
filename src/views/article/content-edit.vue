@@ -143,14 +143,12 @@ export default {
           const formData = new FormData();
           formData.append('file', file, file.name);
           this.$http.post('/article/upload', formData).then(res => {
-            console.log(res)
             if (res.data.data) {
               success(res.data.data);
             } else {
               error(res.data.msg);
             }
           }).catch(e => {
-            console.error(e);
             error(e.message);
           });
         },
