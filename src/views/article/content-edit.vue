@@ -14,19 +14,18 @@
           </el-form-item>
         </el-col>
       </el-row>
-
       <el-row :gutter="48" type="flex" justify="center" style="padding: 15px 0">
         <el-col :span="10">
           <el-form-item label="文章作者:" prop="author">
             <el-select v-model="form.author" filterable allow-create placeholder="请选择作者" class="ele-fluid" clearable>
-              <el-option v-for="item in authors" :key="item.userId" :label="item.nickname" :value="item.nickname"/>
+              <el-option v-for="item in baseData.authors" :key="item.userId" :label="item.nickname" :value="item.nickname"/>
             </el-select>
           </el-form-item>
         </el-col>
         <el-col :span="10">
           <el-form-item label="文章来源:" prop="from">
             <el-select v-model="form.origin" filterable allow-create placeholder="请选择文章来源" class="ele-fluid" clearable>
-              <el-option v-for="item in origins" :key="item.id" :label="item.name" :value="item.name"/>
+              <el-option v-for="item in baseData.origins" :key="item.id" :label="item.name" :value="item.name"/>
             </el-select>
           </el-form-item>
         </el-col>
@@ -36,7 +35,7 @@
         <el-col :span="10">
           <el-form-item label="文章分类:" prop="cate">
             <el-select v-model="form.categories" multiple  clearable placeholder="请选择分类" class="ele-fluid">
-              <el-option v-for="item in categories" :key="item.id" :label="item.name" :value="item.name"/>
+              <el-option v-for="item in baseData.categories" :key="item.id" :label="item.name" :value="item.name"/>
             </el-select>
           </el-form-item>
         </el-col>
@@ -62,7 +61,7 @@
         <el-col :span="10">
           <el-form-item label="文章标签:" prop="tags" style="padding-top: 18px">
             <el-select v-model="form.tags" multiple filterable allow-create placeholder="请选择文章标签" class="ele-fluid">
-              <el-option v-for="item in tags" :key="item.id" :label="item.name" :value="item.name"></el-option>
+              <el-option v-for="item in baseData.tags" :key="item.id" :label="item.name" :value="item.name"></el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="发布时间:" prop="time" style="margin-top: 48px">
@@ -90,7 +89,7 @@
       <el-row v-if="form.isUrl !== '1'" type="flex" justify="center" style="padding: 15px 0">
         <el-col :span="20">
           <el-form-item label="文章内容:">
-            <tinymce-editor v-model="form.content" :init="option"/>
+            <tinymce-editor v-model="form.content" :init="config"/>
           </el-form-item>
         </el-col>
       </el-row>
@@ -115,54 +114,12 @@ export default {
     // 弹窗是否打开
     visible: Boolean,
     // 修改回显的数据
-    data: Object
+    data: Object,
+    //获取分类
+    baseData:Object
   },
   data(){
-    let file_picker_callback = (callback, value, meta) => {
-      let input = document.createElement('input');
-      input.setAttribute('type', 'file');
-      // 设定文件可选类型
-      if (meta.filetype === 'image') {
-        input.setAttribute('accept', 'image/*');
-      } else if (meta.filetype === 'media') {
-        input.setAttribute('accept', 'video/*');
-      }
-
-      input.onchange = () => {
-        let file = input.files[0];
-
-        const formData = new FormData()
-
-        formData.append('file', file, file.name);
-        this.$http.post('/file/upload', formData).then(res => {
-          console.log(res)
-          if (res.data.url) {
-            // success(res.data.url);
-          } else {
-            // error(res.data.msg);
-          }
-        }).catch(e => {
-          console.error(e);
-          this.$message.error(e.message);
-        });
-      }
-      input.click();
-    };
-
     return {
-      //编辑器设置
-      option: {
-        height: 300,
-        file_picker_callback: file_picker_callback
-      },
-      //管理员列表
-      authors:[],
-      //来源列表
-      origins:[],
-      //分类列表
-      categories:[],
-      //标签列表
-      tags:[],
       // 表单数据
       form: Object.assign({}, this.data),
       // 编辑表单加载状态
@@ -177,18 +134,61 @@ export default {
           {required: true, message: '请输入文章标题', trigger: 'blur'}
         ],
       },
+
+      config: {
+        height: 300,
+        images_upload_handler: (blobInfo, success, error) => {
+          let file = blobInfo.blob();
+          // 使用axios上传
+          const formData = new FormData();
+          formData.append('file', file, file.name);
+          this.$http.post('/article/upload', formData).then(res => {
+            console.log(res)
+            if (res.data.data) {
+              success(res.data.data);
+            } else {
+              error(res.data.msg);
+            }
+          }).catch(e => {
+            console.error(e);
+            error(e.message);
+          });
+        },
+        file_picker_callback: (callback, value, meta) => {
+          let input = document.createElement('input');
+          input.setAttribute('type', 'file');
+          // 设定文件可选类型
+          if (meta.filetype === 'image') {
+            input.setAttribute('accept', 'image/*');
+          } else if (meta.filetype === 'media') {
+            input.setAttribute('accept', 'video/*');
+            //input.setAttribute('accept', 'audio/*');
+          }
+          input.onchange = () => {
+            let file = input.files[0];
+            // 使用axios上传
+            const formData = new FormData();
+            formData.append('file', file, file.name);
+            this.$http.post('/article/upload', formData).then(res => {
+              if (res.data.url) {
+                this.$message.success(res.data.url);
+              } else {
+                this.$message.error(res.data.msg);
+              }
+            }).catch(e => {
+              console.error(e);
+              this.$message.error(e.message);
+            });
+          }
+          input.click();
+        }
+      }
     }
-  },
-  mounted() {
-    this.getAuthor();
-    this.getFrom();
-    this.getCate();
-    this.getTags();
   },
   watch: {
     data() {
       if (this.data) {
-        this.form = Object.assign({}, this.data,{categories:this.categories.map(d=>d.name)},{tags:this.tags.map(d=>d.name)});
+        this.form = Object.assign({}, this.data,{categories:this.baseData.categories.map(d=>d.name)},{tags:this.baseData.tags.map(d=>d.name)});
         this.form.categories = this.data.categories?JSON.parse(this.data.categories):""
         this.form.tags = this.data.tags?JSON.parse(this.data.tags):""
         this.isUpdate = true;
@@ -199,38 +199,6 @@ export default {
     }
   },
   methods:{
-    /*获取作者列表*/
-    getAuthor(){
-      this.$http.get('/article/author').then(res=>{
-        if (res.data.code===0){
-          this.authors = res.data.data
-        }
-      })
-    },
-    /*获取来源列表*/
-    getFrom(){
-      this.$http.get('/article/getFrom').then(res=>{
-        if (res.data.code===0){
-          this.origins = res.data.data
-        }
-      })
-    },
-    /*获取分类*/
-    getCate(){
-      this.$http.get('/article/getCate').then(res=>{
-        if (res.data.code===0){
-          this.categories = res.data.data
-        }
-      })
-    },
-    /*获取标签*/
-    getTags(){
-      this.$http.get('/article/getTags').then(res=>{
-        if (res.data.code===0){
-          this.tags = res.data.data
-        }
-      })
-    },
     onChange(file){
       formData.append('file',file.raw)
       let fileName = file.name;
@@ -260,6 +228,7 @@ export default {
           this.$emit('done');
         }else{
           this.$message.error(res.data.msg);
+          this.editLoading = false;
         }
       }).catch(e=>{
         this.$message.error(e.message);
@@ -271,6 +240,8 @@ export default {
     /* 更新visible */
     updateVisible(value) {
       this.imageUrl = "";
+      formData.delete('data');
+      formData.delete('file')
       this.$emit('update:visible', value);
       this.$emit('done')
     }
