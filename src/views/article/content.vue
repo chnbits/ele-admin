@@ -270,33 +270,25 @@ export default {
     /*获取作者列表*/
     getAuthor(){
       this.$http.get('/article/author').then(res=>{
-        if (res.data.code===0){
-          this.baseData.authors = res.data.data
-        }
+          this.baseData.authors = res.data
       })
     },
     /*获取来源列表*/
     getFrom(){
       this.$http.get('/article/getFrom').then(res=>{
-        if (res.data.code===0){
-          this.baseData.origins = res.data.data
-        }
+          this.baseData.origins = res.data
       })
     },
     /*获取分类*/
     getCate(){
       this.$http.get('/article/getCate').then(res=>{
-        if (res.data.code===0){
-          this.baseData.categories = res.data.data
-        }
+          this.baseData.categories = res.data
       })
     },
     /*获取标签*/
     getTags(){
       this.$http.get('/article/getTags').then(res=>{
-        if (res.data.code===0){
-          this.baseData.tags = res.data.data
-        }
+          this.baseData.tags = res.data
       })
     },
     /* 显示编辑弹窗 */

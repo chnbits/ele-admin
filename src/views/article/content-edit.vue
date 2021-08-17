@@ -160,7 +160,7 @@ export default {
             input.setAttribute('accept', 'image/*');
           } else if (meta.filetype === 'media') {
             input.setAttribute('accept', 'video/*');
-            //input.setAttribute('accept', 'audio/*');
+            input.setAttribute('accept', 'audio/*');
           }
           input.onchange = () => {
             let file = input.files[0];
