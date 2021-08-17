@@ -247,7 +247,7 @@ export default {
       this.$http.get('/article',{params:{page:this.page.page,limit:this.page.limit}}).then(res=>{
         if (res.data.code===0){
           this.data = res.data.data
-          this.data.count = res.data.data.count
+          this.data.count = res.data.count
           this.loading = false
         }else{
           this.$message.error(res.data.msg)
