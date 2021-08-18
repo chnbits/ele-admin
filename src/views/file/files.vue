@@ -139,7 +139,7 @@ export default {
       if (!this.$hasPermission('file:files:upload')){
         return this.$message.warning('没有权限！');
       }
-      this.path = this.directory;
+      this.path = this.directory.join('/');
       this.showUpload = true;
     },
     /*创建文件夹*/
@@ -147,7 +147,7 @@ export default {
       if (!this.$hasPermission('file:files:folder')){
         return this.$message.warning('没有权限！');
       }
-      this.path = this.directory;
+      this.path = this.directory.join('/');
       this.showEdit = true;
     },
     /*移动复制文件*/
@@ -297,7 +297,7 @@ export default {
 
       let formData = new FormData();
       formData.append('file', file);
-      formData.append('directory',this.directory);
+      formData.append('directory',this.directory.join('/'));
       this.$http.post('/file/upload', formData).then(res => {
         loading.close();
         if (res.data.code === 0) {
