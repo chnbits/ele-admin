@@ -114,35 +114,30 @@ export default {
         {
           prop: 'dictDataName',
           label: '字典项名称',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 120
         },
         {
           prop: 'dictDataCode',
           label: '字典项名',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
           prop: 'dictDataValue',
           label: '字典项值',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
           prop: 'sortNumber',
           label: '排序号',
-          sortable: 'custom',
           showOverflowTooltip: true,
           width: 90
         },
         {
           prop: 'createTime',
           label: '创建时间',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110,
           formatter: (row, column, cellValue) => {

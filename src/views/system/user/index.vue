@@ -90,7 +90,9 @@ export default {
         },
         {
           columnKey: 'index',
-          type: 'index',
+          prop: 'userId',
+          label: 'ID',
+          // type: 'index',
           width: 45,
           align: 'center',
           showOverflowTooltip: true
