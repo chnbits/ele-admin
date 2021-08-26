@@ -149,9 +149,6 @@ export default {
 </script>
 
 <style scoped>
-  .el-icon-plus {
-    border: 1px dashed #d9d9d9;
-  }
   .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;

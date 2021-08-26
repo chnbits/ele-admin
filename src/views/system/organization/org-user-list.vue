@@ -133,28 +133,24 @@ export default {
         {
           prop: 'username',
           label: '用户账号',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
           prop: 'nickname',
           label: '用户名',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
           prop: 'sexName',
           label: '性别',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 80
         },
         {
           prop: 'phone',
           label: '手机号',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
@@ -168,7 +164,6 @@ export default {
         {
           prop: 'createTime',
           label: '创建时间',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110,
           formatter: (row, column, cellValue) => {
@@ -179,7 +174,6 @@ export default {
           prop: 'state',
           label: '状态',
           align: 'center',
-          sortable: 'custom',
           width: 80,
           resizable: false,
           slot: 'state'

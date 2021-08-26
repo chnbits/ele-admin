@@ -28,21 +28,25 @@
           <el-form-item label="邮箱:">
             <el-input clearable v-model="form.email" placeholder="请输入邮箱"/>
           </el-form-item>
-          <el-form-item label="个人简介:">
-            <el-input clearable v-model="form.introduction" placeholder="请输入个人简介"/>
+          <el-form-item label="组织部门:">
+            <el-select clearable class="ele-block" v-model="form.organizationId" placeholder="请选择部门">
+              <el-option v-for="item in organizeList" :key="item.organizationId" :label="item.organizationName" :value="item.organizationId"/>
+            </el-select>
           </el-form-item>
           <el-form-item v-if="!isUpdate" label="登录密码:" prop="password">
             <el-input v-model="form.password" placeholder="请输入登录密码" show-password/>
           </el-form-item>
         </el-col>
       </el-row>
+      <el-row>
+        <el-form-item label="个人简介:">
+          <el-input clearable v-model="form.introduction" placeholder="请输入个人简介"/>
+        </el-form-item>
+      </el-row>
     </el-form>
     <div slot="footer">
-      <el-button
-        @click="updateVisible(false)">取消
-      </el-button>
-      <el-button type="primary" :loading="loading" @click="save">保存
-      </el-button>
+      <el-button @click="updateVisible(false)">取消</el-button>
+      <el-button type="primary" :loading="loading" @click="save">保存</el-button>
     </div>
   </el-dialog>
 </template>
@@ -90,7 +94,9 @@ export default {
       // 角色列表
       roleList: [],
       //性别列表
-      sexList:[{sex:'0',sexName:'未知'},{sex:'1',sexName:'男'},{sex:'2',sexName:'女'}]
+      sexList:[{sex:0,sexName:'未知'},{sex:1,sexName:'男'},{sex:2,sexName:'女'}],
+      //组织列表
+      organizeList:[]
     };
   },
   watch: {
@@ -108,6 +114,7 @@ export default {
   },
   mounted() {
     this.queryRoles();  // 查询角色列表
+    this.queryOrganization()
   },
   methods: {
     /* 保存编辑 */
@@ -151,6 +158,17 @@ export default {
       }).catch(e => {
         this.$message.error(e.message);
       });
+    },
+    queryOrganization(){
+      this.$http.get('/sys/organization').then(res=>{
+        if (res.data.code === 0){
+          this.organizeList = res.data.data;
+        }else{
+          this.$message.error(res.data.msg);
+        }
+      }).catch(e=>{
+        this.$message.error(e.message);
+      })
     }
   }
 }
