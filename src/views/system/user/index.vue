@@ -92,7 +92,6 @@ export default {
           columnKey: 'index',
           prop: 'userId',
           label: 'ID',
-          // type: 'index',
           width: 45,
           align: 'center',
           showOverflowTooltip: true
@@ -115,14 +114,12 @@ export default {
         {
           prop: 'sexName',
           label: '性别',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 80
         },
         {
           prop: 'phone',
           label: '手机号',
-          sortable: 'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },

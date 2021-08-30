@@ -125,7 +125,8 @@ export default {
       columns: [
         {
           columnKey: 'index',
-          type: 'index',
+          prop:'userId',
+          label:'ID',
           width: 45,
           align: 'center',
           showOverflowTooltip: true
@@ -133,12 +134,14 @@ export default {
         {
           prop: 'username',
           label: '用户账号',
+          sortable:'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
         {
           prop: 'nickname',
           label: '用户名',
+          sortable:'custom',
           showOverflowTooltip: true,
           minWidth: 110
         },
@@ -164,6 +167,7 @@ export default {
         {
           prop: 'createTime',
           label: '创建时间',
+          sortable:'custom',
           showOverflowTooltip: true,
           minWidth: 110,
           formatter: (row, column, cellValue) => {
@@ -174,6 +178,7 @@ export default {
           prop: 'state',
           label: '状态',
           align: 'center',
+          sortable:'custom',
           width: 80,
           resizable: false,
           slot: 'state'

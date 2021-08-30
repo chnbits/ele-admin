@@ -11,35 +11,26 @@
             <h2 class="user-info-name">{{form.nickname}}</h2>
             <div class="user-info-desc">{{ form.introduction }}</div>
           </div>
-<!--          <div class="user-info-list">-->
-<!--            <div class="user-info-item">-->
-<!--              <i class="el-icon-user"></i>-->
-<!--              <span>资深前端工程师</span>-->
-<!--            </div>-->
-<!--            <div class="user-info-item">-->
-<!--              <i class="el-icon-office-building"></i>-->
-<!--              <span>某某公司 - 某某事业群 - 某某技术部</span>-->
-<!--            </div>-->
-<!--            <div class="user-info-item">-->
-<!--              <i class="el-icon-location-information"></i>-->
-<!--              <span>中国 • 浙江省 • 杭州市</span>-->
-<!--            </div>-->
-<!--            <div class="user-info-item">-->
-<!--              <i class="el-icon-_school"></i>-->
-<!--              <span>JavaScript、HTML、CSS、Vue、Node</span>-->
-<!--            </div>-->
-<!--          </div>-->
           <div style="margin: 30px 0 20px 0;">
             <el-divider class="ele-divider-dashed ele-divider-base"/>
           </div>
-          <h6 class="ele-text" style="margin-bottom: 8px;">标签</h6>
-          <div class="user-info-tags">
-            <el-tag size="mini" type="info">很有想法的</el-tag>
-            <el-tag size="mini" type="info">专注设计</el-tag>
-            <el-tag size="mini" type="info">辣~</el-tag>
-            <el-tag size="mini" type="info">大长腿</el-tag>
-            <el-tag size="mini" type="info">川妹子</el-tag>
-            <el-tag size="mini" type="info">海纳百川</el-tag>
+          <div class="user-info-list">
+            <div class="user-info-item">
+              <i class="el-icon-user"></i>
+              <span>{{form.position}}</span>
+            </div>
+            <div class="user-info-item">
+              <i class="el-icon-office-building"></i>
+              <span>{{ form.organizationName }}</span>
+            </div>
+            <div class="user-info-item">
+              <i class="el-icon-location-information"></i>
+              <span>{{ address }}</span>
+            </div>
+            <div class="user-info-item">
+              <i class="el-icon-_school"></i>
+              <el-tag size="mini" type="danger" v-for="(item,key) in form.roles" :key="key">{{ item.roleName }}</el-tag>
+            </div>
           </div>
         </el-card>
       </el-col>
@@ -52,10 +43,8 @@
                   <el-input v-model="form.nickname" placeholder="请输入昵称" clearable/>
                 </el-form-item>
                 <el-form-item label="性别:" prop="sex">
-                  <el-select v-model="form.sexName" placeholder="请选择性别" class="ele-fluid" clearable>
-                    <el-option label="保密" :value="0"/>
-                    <el-option label="男" :value="1"/>
-                    <el-option label="女" :value="2"/>
+                  <el-select clearable class="ele-block" v-model="form.sex" placeholder="请选择性别">
+                    <el-option v-for="item in sexList" :key="item.sex" :label="item.sexName" :value="item.sex"/>
                   </el-select>
                 </el-form-item>
                 <el-form-item label="联系电话:" prop="phone">
@@ -144,11 +133,13 @@ export default {
   components: {EleCropperDialog},
   data() {
     return {
-      // url:'/main/user',
       // tab页选中
       active: 'info',
       // 表单数据
       form: {},
+      //登录地址
+      address:'',
+      sexList:[{sex:0,sexName:'未知'},{sex:1,sexName:'男'},{sex:2,sexName:'女'}],
       // 表单验证规则
       rules: {
         nickname: [
@@ -178,8 +169,19 @@ export default {
     query(){
       this.$http.get('/main/user').then(res=>{
         this.form = res.data.data;
+        this.getAddress(this.form.lastIp);
       }).catch(e=>{
         console.log(e.message)
+      })
+    },
+    getAddress(lastIp){
+      this.$http.get('/main/ip',{params:{'ip':lastIp}}).then(res=>{
+        let ip_data = JSON.parse(res.data);
+        if (ip_data.error_code === 0){
+          this.address = ip_data.result.Province!==''?ip_data.result.Country+'-'+ip_data.result.Province+'-'+ip_data.result.City:ip_data.result.City;
+        }else {
+          this.address = '未知区域';
+        }
       })
     },
     /* 保存更改 */
@@ -300,8 +302,10 @@ export default {
 }
 
 /* 用户标签 */
-.user-info-tags .el-tag {
+.user-info-item .el-tag {
   margin: 10px 10px 0 0;
+  text-align: center;
+  flex: none;
 }
 
 /* 用户账号绑定列表 */

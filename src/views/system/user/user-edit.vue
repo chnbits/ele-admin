@@ -36,6 +36,11 @@
           <el-form-item v-if="!isUpdate" label="登录密码:" prop="password">
             <el-input v-model="form.password" placeholder="请输入登录密码" show-password/>
           </el-form-item>
+          <el-form-item v-if="isUpdate" label="头衔标签:">
+            <el-select clearable class="ele-block" v-model="form.position" placeholder="请选择头衔">
+              <el-option v-for="item in positionList" :key="item.id" :label="item.name" :value="item.id"/>
+            </el-select>
+          </el-form-item>
         </el-col>
       </el-row>
       <el-row>
@@ -96,7 +101,9 @@ export default {
       //性别列表
       sexList:[{sex:0,sexName:'未知'},{sex:1,sexName:'男'},{sex:2,sexName:'女'}],
       //组织列表
-      organizeList:[]
+      organizeList:[],
+      //头衔列表
+      positionList:[]
     };
   },
   watch: {
@@ -113,8 +120,9 @@ export default {
     }
   },
   mounted() {
-    this.queryRoles();  // 查询角色列表
-    this.queryOrganization()
+    this.queryRoles();
+    this.queryOrganization();
+    this.queryPosition();
   },
   methods: {
     /* 保存编辑 */
@@ -159,10 +167,22 @@ export default {
         this.$message.error(e.message);
       });
     },
+    /*查询职务*/
     queryOrganization(){
       this.$http.get('/sys/organization').then(res=>{
         if (res.data.code === 0){
           this.organizeList = res.data.data;
+        }else{
+          this.$message.error(res.data.msg);
+        }
+      }).catch(e=>{
+        this.$message.error(e.message);
+      })
+    },
+    queryPosition(){
+      this.$http.get('/sys/position/get').then(res=>{
+        if (res.data.code === 0){
+          this.positionList = res.data.data;
         }else{
           this.$message.error(res.data.msg);
         }
