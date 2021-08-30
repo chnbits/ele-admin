@@ -17,7 +17,7 @@
           <div class="user-info-list">
             <div class="user-info-item">
               <i class="el-icon-user"></i>
-              <span>{{form.position}}</span>
+              <span>{{form.positionName}}</span>
             </div>
             <div class="user-info-item">
               <i class="el-icon-office-building"></i>
@@ -121,7 +121,7 @@
       </el-col>
     </el-row>
     <!-- 头像裁剪弹窗 -->
-    <ele-cropper-dialog :show.sync="showCropper" @crop="onCrop" :src="form.avatar" :lock-scroll="false"/>
+    <ele-cropper-dialog :show.sync="showCropper" @crop="onCrop" :src="form.avatar" :to-blob="true" :lock-scroll="false"/>
   </div>
 </template>
 
@@ -139,6 +139,7 @@ export default {
       form: {},
       //登录地址
       address:'',
+      position:'',
       sexList:[{sex:0,sexName:'未知'},{sex:1,sexName:'男'},{sex:2,sexName:'女'}],
       // 表单验证规则
       rules: {
@@ -206,9 +207,30 @@ export default {
       });
     },
     /* 头像裁剪完成回调 */
-    onCrop(res) {
-      this.form.avatar = res;
-      this.showCropper = false;
+    onCrop(blob) {
+      let date = new Date();
+      const formData = new FormData();
+      formData.append('file', blob,'avatar'+ date.getTime());
+      formData.append('directory','/attachment/avatar')
+      // 使用axios上传
+      this.$http.post('/file/upload', formData).then(res => {
+        if (res.data.code === 0){
+          let url = res.data.url;
+          this.$http.post('/sys/user/avatar',{'url':url}).then(re=>{
+            if(re.data.code === 0){
+              this.$message.success(re.data.msg)
+              this.showCropper = false
+
+            }else {
+              this.$message.success(re.data.msg)
+            }
+          })
+        }else{
+          this.$message.error(res.data.msg)
+        }
+      }).catch(e => {
+        console.error(e);
+      });
     }
   }
 }
