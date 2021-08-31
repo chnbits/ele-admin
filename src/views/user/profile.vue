@@ -211,7 +211,7 @@ export default {
       let date = new Date();
       const formData = new FormData();
       formData.append('file', blob,'avatar'+ date.getTime());
-      formData.append('directory','/attachment/avatar')
+      formData.append('directory','attachment/avatar')
       // 使用axios上传
       this.$http.post('/file/upload', formData).then(res => {
         if (res.data.code === 0){
@@ -220,7 +220,7 @@ export default {
             if(re.data.code === 0){
               this.$message.success(re.data.msg)
               this.showCropper = false
-
+              this.query()
             }else {
               this.$message.success(re.data.msg)
             }
